@@ -1,0 +1,136 @@
+/* .header {
+  padding: 30px 0 49px 0;
+} */
+.header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-content {
+  display: flex;
+  flex-direction: column;
+  margin-left: 63px;
+}
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #c5c5c5;
+  padding: 64px 20px 25px 26px;
+}
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 0;
+}
+.item {
+  list-style: none;
+}
+.link {
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Montserrat';
+}
+.phone {
+  margin-left: 230px;
+}
+.phone a {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Montserrat';
+}
+
+.social {
+  display: flex;
+  margin-left: 58px;
+  gap: 8px;
+}
+.social a {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.social a span {
+  position: absolute;
+  border-radius: 50%;
+  background-color: #b6d5b9;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 23px;
+  top: 8px;
+  font-weight: 400;
+  font-size: 9px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Montserrat';
+}
+
+.header-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0 49px 26px;
+}
+.submenu-items {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  padding: 0;
+}
+.submenu-link {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Montserrat';
+}
+.search {
+  position: relative;
+  display: inline-block;
+}
+.search img {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.search input {
+  padding: 10px 10px 10px 43px;
+  border: 1px solid #202b21;
+  border-radius: 30px;
+  width: 215px;
+  height: 41px;
+  outline: none;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Montserrat';
+}
+.search input::placeholder {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Montserrat';
+}
+
+/* hr {
+  margin-top: 25px;
+  margin-bottom: 26px;
+  border: 1px solid #c5c5c5;
+  width: 100%;
+  margin: 20px auto;
+  opacity: 0.7;
+} */

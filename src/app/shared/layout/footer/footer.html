@@ -1,0 +1,74 @@
+<footer class="footer">
+  <div class="container">
+    <div class="logo">
+      <a href="#">
+        <img src="assets/images/logo-footer.png" alt="logo" />
+      </a>
+    </div>
+    <div class="footer-content">
+      <div class="footer-menu">
+        <div class="footer-menu-title">МЕНЮ</div>
+        <ul class="footer-menu-items">
+          <li class="footer-menu-item"><a href="#">Главная</a></li>
+          <li class="footer-menu-item"><a href="#">Каталог</a></li>
+          <li class="footer-menu-item"><a href="#">Доставка и оплата</a></li>
+          <li class="footer-menu-item"><a href="#">Новости</a></li>
+          <li class="footer-menu-item"><a href="#">Отзывы</a></li>
+        </ul>
+      </div>
+      <div class="footer-category">
+        <div class="footer-category-title">КАТЕГОРИИ</div>
+        <ul class="footer-category-items">
+          @for (item of categories(); track item.id) {
+            <li class="footer-menu-item">
+              <a href="#">{{ item.name }}</a>
+            </li>
+          }
+        </ul>
+      </div>
+      <div class="footer-social">
+        <div class="footer-social-title">МЫ В СОЦИАЛЬНЫХ СЕТЯХ</div>
+        <div class="footer-social-icons">
+          <a href="#"><img src="assets/images/VK.png" alt="VK" /></a>
+          <a href="#"><img src="assets/images/FB.png" alt="FB" /></a>
+          <a href="#"><img src="assets/images/Inst.png" alt="Inst" /></a>
+        </div>
+        <div class="footer-social-pay">
+          <div class="pay-card">
+            <img width="60" height="29" src="assets/images/visa.png" alt="visa" />
+          </div>
+          <div class="pay-card">
+            <img width="48" height="33" src="assets/images/Master-c.png" alt="Master" />
+          </div>
+          <div class="pay-card">
+            <img width="64" height="25" src="assets/images/Alfa.png" alt="" />
+          </div>
+          <div class="pay-card">
+            <img width="54" height="22" src="assets/images/pay.png" alt="" />
+          </div>
+          <div class="pay-card">
+            <img width="54" height="24" src="assets/images/samsung.png" alt="" />
+          </div>
+          <div class="pay-card">
+            <img width="30" height="32" src="assets/images/belcard.png" alt="" />
+          </div>
+        </div>
+      </div>
+      <div class="footer-contact">
+        <div class="footer-contact-title">КОНТАКТЫ</div>
+        <div class="footer-contact-addres">
+          Адрес
+          <p>г. Минск, ул. Калиновского 61, подъезд 1, офис 6</p>
+        </div>
+        <div class="footer-contact-phone">
+          Телефон
+          <p>+ 375 (29) 922-29-99</p>
+        </div>
+        <div class="footer-contact-email">
+          E-mail
+          <p>homedecor@gmail.com</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,108 @@
+<div class="cart">
+  <div class="container">
+    <div class="cart-title">Корзина</div>
+    <div class="cart-content">
+      @if (productCart()?.length === 0) {
+        <div class="cart-products not">
+          <div class="cart-title">Товаров в корзине нет</div>
+          <button class="button-transparent">Продолжить покупки</button>
+        </div>
+      } @else {
+        <div class="cart-products">
+          @for (item of productCart(); track item.product.id) {
+            <div class="cart-product">
+              <div
+                class="cart-product-img"
+                [ngStyle]="{ 'background-image': 'url(' + urlImg + item.product.image + ')' }"
+              ></div>
+              <div class="cart-product-name">{{ item.product.name }}</div>
+              <div class="cart-product-count">
+                <div>
+                  <svg
+                    width="10"
+                    height="3"
+                    viewBox="0 0 10 3"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M9.14019 3V0H0V3H9.14019Z" fill="#c8eacb" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  [value]="item.quantity"
+                  (change)="onQuantityInput(item, $event)"
+                />
+                <div>
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7.14785 11.8987V7.14809H11.8987V4.77279H7.14785V0H4.77243V4.77279H0V7.14809H4.77243V11.8987H7.14785Z"
+                      fill="#C8EACB"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="cart-product-price">{{ item.product.price }} BYN</div>
+              <div class="cart-product-close">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g clip-path="url(#clip0_1_1332)">
+                    <line
+                      x1="1.93562"
+                      y1="2.6499"
+                      x2="13.9564"
+                      y2="14.6707"
+                      stroke="#A8ABA7"
+                      stroke-linecap="round"
+                    />
+                    <line
+                      x1="13.9238"
+                      y1="2.62996"
+                      x2="1.90301"
+                      y2="14.6508"
+                      stroke="#A8ABA7"
+                      stroke-linecap="round"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_1_1332">
+                      <rect width="16" height="16" fill="white" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="cart-info">
+        <div class="cart-info-price">
+          <div class="cart-info-title">Ваш заказ</div>
+          <div class="cart-info-quantity">
+            Товаров: <span>{{ totalCount() }}</span>
+          </div>
+          <div class="cart-info-total">
+            Общая стоимость: <span>{{ totalPrice() }} BYN</span>
+            <div>* без учета доставки</div>
+          </div>
+        </div>
+        <div class="cart-info-actions">
+          <button class="button-transparent">Продолжить покупки</button>
+          <button class="button">Оформить заказ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

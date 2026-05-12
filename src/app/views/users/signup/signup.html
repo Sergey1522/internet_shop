@@ -1,0 +1,71 @@
+<section class="signup">
+  <div class="container">
+    <div class="auth-form" [formGroup]="signupForm" appMatchPasswordDirective>
+      <div class="auth-title">Регистрация на сайте</div>
+      <div class="auth-inputs">
+        <div class="auth-input">
+          <input
+            type="text"
+            name="email"
+            [ngStyle]="{
+              'border-color':
+                signupForm.get('email')?.invalid &&
+                (signupForm.get('email')?.dirty || signupForm.get('email')?.touched)
+                  ? 'red'
+                  : '',
+            }"
+            placeholder="Электронная почта"
+            formControlName="email"
+          />
+        </div>
+        <div class="auth-input">
+          <input
+            type="password"
+            name="password"
+            [ngStyle]="{
+              'border-color':
+                signupForm.get('password')?.invalid &&
+                (signupForm.get('password')?.dirty || signupForm.get('password')?.touched)
+                  ? 'red'
+                  : '',
+            }"
+            placeholder="Пароль"
+            formControlName="password"
+          />
+        </div>
+        <div class="auth-input">
+          <input
+            type="password"
+            name="passwordRepeat"
+            [ngStyle]="{
+              'border-color':
+                signupForm.get('passwordRepeat')?.invalid &&
+                (signupForm.get('passwordRepeat')?.dirty ||
+                  signupForm.get('passwordRepeat')?.touched)
+                  ? 'red'
+                  : '',
+            }"
+            placeholder="Повторите пароль"
+            formControlName="passwordRepeat"
+          />
+        </div>
+        <div class="auth-checkbox">
+          <input type="checkbox" name="accept" id="accept" formControlName="accept" />
+          <label for="accept"
+            >Я принимаю <a href="">условия пользовательского соглашения</a> и даю согласие
+            <a href="">на обработку персональных данных.</a></label
+          >
+        </div>
+      </div>
+      <div class="auth-button">
+        <button class="button" [disabled]="signupForm.invalid" (click)="signup()">
+          Зарегистрироваться
+        </button>
+      </div>
+      <div class="auth-link">Уже есть аккаунт? <a routerLink="/login">Войдите</a></div>
+    </div>
+    <div class="page-image">
+      <img src="assets/images/signup-img.png" alt="signup-img" />
+    </div>
+  </div>
+</section>

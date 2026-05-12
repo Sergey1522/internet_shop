@@ -1,0 +1,16 @@
+@import url('_fonts.css');
+@import url('_global.css');
+
+app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+app-main {
+  flex: 1 0 auto;
+}
+
+app-footer {
+  flex-shrink: 0;
+}

@@ -1,0 +1,73 @@
+<div class="product-card">
+  <div class="product-card-favorite">
+    <span>
+      <svg
+        width="20"
+        height="18"
+        viewBox="0 0 20 18"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9.85417 17.6917C9.57 17.6917 9.295 17.655 9.06583 17.5725C5.56417 16.3717 0 12.1092 0 5.81167C0 2.60333 2.59417 0 5.78417 0C7.33333 0 8.78167 0.605 9.85417 1.68667C10.9267 0.605 12.375 0 13.9242 0C17.1142 0 19.7083 2.6125 19.7083 5.81167C19.7083 12.1183 14.1442 16.3717 10.6425 17.5725C10.4133 17.655 10.1383 17.6917 9.85417 17.6917ZM5.78417 1.375C3.355 1.375 1.375 3.36417 1.375 5.81167C1.375 12.0725 7.3975 15.5558 9.515 16.28C9.68 16.335 10.0375 16.335 10.2025 16.28C12.3108 15.5558 18.3425 12.0817 18.3425 5.81167C18.3425 3.36417 16.3625 1.375 13.9333 1.375C12.54 1.375 11.2475 2.02583 10.4133 3.15333C10.1567 3.50167 9.57 3.50167 9.31333 3.15333C8.46083 2.01667 7.1775 1.375 5.78417 1.375Z"
+          fill="#383838"
+        />
+      </svg>
+    </span>
+  </div>
+  <div
+    class="product-card-img"
+    [ngStyle]="{ 'background-image': 'url(' + urlImg + product.image + ')' }"
+  ></div>
+  <div class="product-card-name">{{ product.name }}</div>
+  <div class="product-card-info">
+    <div class="product-card-price">{{ product.price }} BYN</div>
+    <div class="product-card-action">
+      @if (!isLoading()) {
+        <button class="button" (click)="addToProduct()">В корзину</button>
+      } @else if (isLoading()) {
+        <button class="button-transparent">В корзинe</button>
+      }
+    </div>
+  </div>
+  <div class="product-card-extra">
+    <div class="product-card-count">
+      <div>
+        <svg
+          (click)="decreaseQuantity()"
+          width="10"
+          height="3"
+          viewBox="0 0 10 3"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M9.14019 3V0H0V3H9.14019Z" fill="#9AA89B" />
+        </svg>
+      </div>
+      <input type="text" [(ngModel)]="count" />
+      <div>
+        <svg
+          (click)="increaseQuantity()"
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M7.20871 12V7.20896H12V4.81343H7.20871V0H4.81307V4.81343H0V7.20896H4.81307V12H7.20871Z"
+            fill="#9AA89B"
+          />
+        </svg>
+      </div>
+    </div>
+    <a [routerLink]="'/product/' + product.url" class="product-card-more">
+      <svg width="18" height="4" viewBox="0 0 18 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="2" cy="2" r="2" fill="#9AA89B" />
+        <circle cx="8.66699" cy="2" r="2" fill="#9AA89B" />
+        <circle cx="15.333" cy="2" r="2" fill="#9AA89B" />
+      </svg>
+      <span>Подробнее</span>
+    </a>
+  </div>
+</div>

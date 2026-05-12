@@ -1,0 +1,120 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+a {
+  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+}
+li {
+  list-style: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+/* login end Signup */
+.auth-form {
+  width: 422px;
+}
+.auth-title {
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Lora', sans-serif;
+  margin-bottom: 35px;
+}
+.auth-input {
+  margin-bottom: 8px;
+}
+.auth-input input {
+  border: 1.5px solid #2a592e;
+  border-radius: 3px;
+  padding: 20px;
+  width: 422px;
+  outline: none;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  color: #a8aba7;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.auth-checkbox input {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+label {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+}
+label a {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #519057;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.auth-button {
+  margin-bottom: 8px;
+}
+.button {
+  border-radius: 5px;
+  /* padding: 15px 40px;
+  width: 422px;
+  height: 51px; */
+  background: #456f49;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  border: none;
+  cursor: pointer;
+}
+.auth-link {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+}
+.auth-link a {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #519057;
+  font-family: 'Montserrat', sans-serif;
+}
+.mat-mdc-menu-content {
+  background-color: #fff;
+}
+.mat-mdc-menu-item-text {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #519057;
+  font-family: 'Montserrat', sans-serif;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
