@@ -1,6 +1,6 @@
-/* .header {
-  padding: 30px 0 49px 0;
-} */
+.header {
+  padding: 64px 0 59px 0;
+}
 .header .container {
   display: flex;
   align-items: center;
@@ -10,6 +10,9 @@
   display: flex;
   flex-direction: column;
   margin-left: 63px;
+}
+.logo img {
+  mix-blend-mode: darken;
 }
 .header-top {
   display: flex;
@@ -33,7 +36,7 @@
   font-size: 15px;
   line-height: 130%;
   color: #202b21;
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
 }
 .phone {
   margin-left: 230px;
@@ -43,7 +46,7 @@
   font-size: 16px;
   line-height: 130%;
   color: #202b21;
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
 }
 
 .social {
@@ -71,7 +74,7 @@
   font-size: 9px;
   line-height: 130%;
   color: #202b21;
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
 }
 
 .header-bottom {
@@ -91,7 +94,7 @@
   font-size: 16px;
   line-height: 130%;
   color: #202b21;
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
 }
 .search {
   position: relative;
@@ -116,14 +119,14 @@
   font-size: 16px;
   line-height: 130%;
   color: #202b21;
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
 }
 .search input::placeholder {
   font-weight: 400;
   font-size: 16px;
   line-height: 130%;
   color: #202b21;
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* hr {

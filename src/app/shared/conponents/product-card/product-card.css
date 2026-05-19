@@ -1,3 +1,4 @@
+@import url('./../../../../assets/styles/_fonts.css');
 .product-card {
   position: relative;
   width: 291px;
@@ -23,6 +24,7 @@
   color: #202b21;
   margin-top: 15px;
   height: 52px;
+  font-family: 'Montserrat', sans-serif;
 }
 .product-card-info {
   display: flex;
@@ -99,4 +101,5 @@ input {
   font-size: 16px;
   line-height: 130%;
   color: #9aa89b;
+  font-family: 'Montserrat', sans-serif;
 }

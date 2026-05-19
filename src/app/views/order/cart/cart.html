@@ -2,7 +2,7 @@
   <div class="container">
     <div class="cart-title">Корзина</div>
     <div class="cart-content">
-      @if (productCart()?.length === 0) {
+      @if (productCart().length === 0) {
         <div class="cart-products not">
           <div class="cart-title">Товаров в корзине нет</div>
           <button class="button-transparent">Продолжить покупки</button>
@@ -28,11 +28,7 @@
                     <path d="M9.14019 3V0H0V3H9.14019Z" fill="#c8eacb" />
                   </svg>
                 </div>
-                <input
-                  type="text"
-                  [value]="item.quantity"
-                  (change)="onQuantityInput(item, $event)"
-                />
+                <input type="text" [value]="item.quantity" />
                 <div>
                   <svg
                     width="12"

@@ -1,4 +1,4 @@
-import { Component, effect, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, OnInit, signal } from '@angular/core';
 import { ProductType } from '../../../../types/product.type';
 import { ProductService } from '../../../shared/services/product.service';
 import { ProductCard } from '../../../shared/conponents/product-card/product-card';
@@ -6,9 +6,8 @@ import { CategoryWithTypeType } from '../../../../types/category-with-type.type'
 import { ServiceCategory } from '../../../shared/services/service.category';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NgClass } from '../../../../../node_modules/@angular/common/types/_common_module-chunk';
-import { ActiveParamsType } from '../../../../types/active.params.type';
 
+export type SortType = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 @Component({
   selector: 'app-catalog',
   standalone: true,
@@ -33,6 +32,9 @@ export class Catalog implements OnInit {
 
   activeFilters = signal<{ key: string; label: string; type: string; value?: any }[]>([]);
 
+  currentSort = signal<SortType>('name-asc');
+  showSortMenu = signal<boolean>(false);
+
   constructor(
     private productService: ProductService,
     private serviceCategory: ServiceCategory,
@@ -53,6 +55,10 @@ export class Catalog implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.applyFiltersFromUrl(params);
+       const categoryUrl = params['category'];
+      if (categoryUrl) {
+        this.applyCategoryFilter(categoryUrl);
+      }
     });
     this.loadCategoryWithTypes();
   }
@@ -72,6 +78,20 @@ export class Catalog implements OnInit {
     });
 
     this.activeFilters.set(filters);
+  }
+
+   private applyCategoryFilter(categoryUrl: string): void {
+    // Находим категорию и её типы
+    const category = this.categoryWithType().find(c => c.url === categoryUrl);
+
+    if (category && category.types && category.types.length > 0) {
+      // Собираем все URL типов из выбранной категории
+      const typeUrls = category.types.map(type => type.url);
+      this.selectedTypeUrls.set(new Set(typeUrls));
+      console.log(`✅ Применен фильтр по категории: ${category.name}, типы:`, typeUrls);
+    } else {
+      console.warn(`Категория с URL "${categoryUrl}" не найдена`);
+    }
   }
 
   loadProducts(): void {
@@ -101,7 +121,9 @@ export class Catalog implements OnInit {
     });
   }
   private getApiParams(): any {
-    const params: any = {};
+    const params: any = {
+      sort: this.currentSort(),
+    };
 
     const types = Array.from(this.selectedTypeUrls());
     if (types.length > 0) {
@@ -115,8 +137,12 @@ export class Catalog implements OnInit {
 
     return params;
   }
+
   private applyFiltersFromUrl(params: any): void {
     const typesParam = params['types[]'];
+    if (params['sort']) {
+      this.currentSort.set(params['sort']);
+    }
     if (typesParam) {
       console.log(typesParam);
       const typeUrls = Array.isArray(typesParam) ? typesParam : [typesParam];
@@ -185,7 +211,9 @@ export class Catalog implements OnInit {
     if (this.heightTo() !== null) queryParams.heightTo = this.heightTo();
     if (this.diameterFrom() !== null) queryParams.diameterFrom = this.diameterFrom();
     if (this.diameterTo() !== null) queryParams.diameterTo = this.diameterTo();
-
+    if (this.currentSort() !== 'name-asc') {
+      queryParams.sort = this.currentSort();
+    }
     if (this.currentPage() > 1) {
       queryParams.page = this.currentPage();
     }
@@ -236,5 +264,25 @@ export class Catalog implements OnInit {
 
   prevPage(): void {
     this.goToPage(this.currentPage() - 1);
+  }
+
+  //Sorting
+
+  // ✅ Текущая метка сортировки
+  currentSortLabel = computed(() => {
+    const labels: Record<SortType, string> = {
+      'name-asc': 'От А до Я',
+      'name-desc': 'От Я до А',
+      'price-asc': 'По возрастанию цены',
+      'price-desc': 'По убыванию цены',
+    };
+    return labels[this.currentSort()];
+  });
+
+  // ✅ Методы сортировки
+  setSort(sort: SortType): void {
+    this.currentSort.set(sort);
+    this.currentPage.set(1); // Сбрасываем на первую страницу
+    this.showSortMenu.set(false);
   }
 }

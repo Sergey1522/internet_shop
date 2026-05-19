@@ -9,7 +9,7 @@
       <div class="header-top">
         <nav class="navbar">
           <ul class="menu">
-            <li class="item"><a class="link" href="#">Главная</a></li>
+            <li class="item"><a class="link" routerLink="/">Главная</a></li>
             <li class="item"><a class="link" routerLink="/catalog">Каталог</a></li>
             <li class="item"><a class="link" href="#">Отзывы</a></li>
             <li class="item"><a class="link" href="#">Доставка и оплата</a></li>
@@ -146,7 +146,9 @@
           <ul class="submenu-items">
             @for (item of categories(); track item.id) {
               <li class="submenu-item">
-                <a class="submenu-link" href="#">{{ item.name }}</a>
+                <a class="submenu-link" (click)="goToCategory(item.url)" style="cursor: pointer">
+                  {{ item.name }}
+                </a>
               </li>
             }
           </ul>

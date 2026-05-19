@@ -3,7 +3,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CategoryType } from '../../../../types/category.type';
 import { ServiceCategory } from '../../services/service.category';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Route, Router, RouterLink } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { DefaultResponseType } from '../../../../types/default.response.type';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -23,6 +23,7 @@ export class Header implements OnInit {
   constructor(
     private categoryService: ServiceCategory,
     private authService: AuthService,
+    private router: Router,
   ) {
     this.isLogged = this.authService.getIsLoggedIn();
   }
@@ -55,6 +56,13 @@ export class Header implements OnInit {
           this._snackbar.open('Ошибка выхода из системы');
         }
       },
+    });
+  }
+  goToCategory(categoryUrl: string): void {
+    // Находим тип в категории
+    // Для простого перехода по категории используем URL категории
+    this.router.navigate(['/catalog'], {
+      queryParams: { category: categoryUrl },
     });
   }
 }

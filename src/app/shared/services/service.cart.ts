@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { TypeCart } from '../../../types/cart.type';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Environments } from '../../environments/environments';
 
@@ -20,80 +20,113 @@ export interface CartItem {
 export class ServiceCart {
   private apiUrl = Environments.api + 'cart';
 
-  private cartSubject = new BehaviorSubject<TypeCart | null>(null);
-  cart$ = this.cartSubject.asObservable();
-
-  cartItems = signal<CartItem[] | null>(null);
+  // Сигналы для реактивного UI
+  cartItems = signal<CartItem[]>([]);
   cartTotal = signal<number>(0);
   cartCount = signal<number>(0);
+
   constructor(private http: HttpClient) {
-    this.getCart();
+    this.loadCart(); // ✅ Загружаем корзину при создании сервиса
   }
 
-  getCart(): void {
+  // ✅ 1. ЗАГРУЗКА КОРЗИНЫ (обновляет сигналы)
+  loadCart(): void {
     this.http.get<TypeCart>(this.apiUrl).subscribe({
       next: (res) => {
-        this.cartItems.set(res.items || []);
-        this.cartTotal.set(
-          res.items?.reduce((sum, i) => sum + i.product.price * i.quantity, 0) || 0,
-        );
-        this.cartCount.set(res.items?.reduce((sum, i) => sum + i.quantity, 0) || 0);
+        const items = res?.items || [];
+        console.log('📦 Корзина загружена:', items);
+
+        this.cartItems.set(items);
+        this.cartTotal.set(items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0));
+        this.cartCount.set(items.reduce((sum, i) => sum + i.quantity, 0));
       },
-      error: (err) => console.error('Ошибка:', err),
+      error: (err) => {
+        console.error('❌ Ошибка загрузки корзины:', err);
+        this.clearCartState();
+      },
     });
-    // return this.http.get<TypeCart>(Environments.api + 'cart');
   }
 
-  // postCart(productId: string, quantity: number): Observable<TypeCart> {
-  //   return this.http.post<TypeCart>(Environments.api + 'cart', { productId, quantity }).pipe(
-  //     tap((cart: TypeCart) => {
-  //       console.log('Товар добавлен, обновляем корзину:', cart);
-  //       // this.updateCartState(cart);
-  //     }),
-  //   );
-  // }
-  // ✅ Добавление товара (ПРАВИЛЬНЫЙ endpoint)
-  addToCart(productId: string, quantity: number): Observable<any> {
-    // ⚠️ ВАЖНО: используем ТОТ ЖЕ endpoint, что и для обновления
-    // В вашем бэкенде это один и тот же метод updateCart
-    return this.http
-      .post(`${this.apiUrl}`, {
-        productId: productId,
-        quantity: quantity,
-      })
-      .pipe(
-        tap((response: any) => {
-          console.log('✅ Ответ сервера:', response);
-          // Обновляем локальную корзину из ответа сервера
-          if (response?.items) {
-            this.cartItems.set(response.items);
-          } else {
-            // Если сервер не вернул items, делаем отдельный запрос
-            this.getCart();
-          }
-        }),
-      );
+  // ✅ 2. ПОЛУЧЕНИЕ ОБСЕРВЕЙБЛА (для компонентов, которые сами хотят подписаться)
+  getCart(): Observable<TypeCart> {
+    return this.http.get<TypeCart>(this.apiUrl).pipe(
+      tap((res) => this.updateCartState(res)),
+      catchError((err) => {
+        console.error('❌ Ошибка:', err);
+        this.clearCartState();
+        return throwError(() => err);
+      }),
+    );
   }
-  updateQuantity(productId: number, quantity: number): Observable<TypeCart> {
+
+  // ✅ 3. ДОБАВЛЕНИЕ ТОВАРА
+  addToCart(productId: string, quantity: number): Observable<TypeCart> {
+    return this.http.post<TypeCart>(`${this.apiUrl}`, { productId, quantity }).pipe(
+      tap((res) => {
+        console.log('✅ Товар добавлен, обновляем корзину');
+        this.updateCartState(res);
+      }),
+      catchError((err) => {
+        console.error('❌ Ошибка добавления:', err);
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  // ✅ 4. ОБНОВЛЕНИЕ КОЛИЧЕСТВА
+  updateQuantity(productId: string, quantity: number): Observable<TypeCart> {
     return this.http.patch<TypeCart>(`${this.apiUrl}/items/${productId}`, { quantity }).pipe(
-      tap(() => {
-        console.log('✅ Запрос на сервер отправлен');
+      tap((res) => {
+        console.log(`✅ Количество товара ${productId} обновлено`);
+        this.updateCartState(res);
+      }),
+      catchError((err) => {
+        console.error('❌ Ошибка обновления:', err);
+        return throwError(() => err);
       }),
     );
   }
-  removeFromCart(productId: number, cartCount: number): Observable<TypeCart> {
-    return this.http.delete<TypeCart>(`${Environments.api + 'cart'}/items/${productId}`).pipe(
-      tap(() => {
-        console.log(`✅ Товар ${productId} удален из корзины`);
-        this.getCart(); // Обновляем корзину после удаления
+
+  // ✅ 5. УДАЛЕНИЕ ТОВАРА
+  removeFromCart(productId: string): Observable<TypeCart> {
+    return this.http.delete<TypeCart>(`${this.apiUrl}/items/${productId}`).pipe(
+      tap((res) => {
+        console.log(`✅ Товар ${productId} удален`);
+        this.updateCartState(res);
+      }),
+      catchError((err) => {
+        console.error('❌ Ошибка удаления:', err);
+        return throwError(() => err);
       }),
     );
   }
-  // private updateCartState(cart: TypeCart): void {
-  //   console.log(cart);
-  //   this.cartSubject.next(cart);
-  //   this.cartItems.set(cart?.items || []);
-  //   // this.cartTotal.set(cart?.items?.reduce((sum, item) => sum + item.product.)  || 0);
-  //   this.cartCount.set(cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0);
-  // }
+
+  // ✅ 6. ОЧИСТКА КОРЗИНЫ
+  clearCart(): Observable<TypeCart> {
+    return this.http.delete<TypeCart>(this.apiUrl).pipe(
+      tap((res) => {
+        console.log('✅ Корзина очищена');
+        this.updateCartState(res);
+      }),
+      catchError((err) => {
+        console.error('❌ Ошибка очистки:', err);
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  // 🔧 Приватный метод: обновление состояния из ответа сервера
+  private updateCartState(cart: TypeCart): void {
+    const items = cart?.items || [];
+    this.cartItems.set(items);
+    this.cartTotal.set(items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0));
+    this.cartCount.set(items.reduce((sum, i) => sum + i.quantity, 0));
+  }
+
+  // 🔧 Приватный метод: сброс состояния при ошибке
+  private clearCartState(): void {
+    this.cartItems.set([]);
+    this.cartTotal.set(0);
+    this.cartCount.set(0);
+  }
 }

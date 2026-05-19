@@ -127,6 +127,7 @@
   line-height: 130%;
   color: #202b21;
   margin-bottom: 50px;
+  font-family: 'Lora', sans-serif;
 }
 .carousel-arrows {
   display: flex;
@@ -166,6 +167,7 @@
   font-size: 16px;
   line-height: 130%;
   color: #000;
+  font-family: 'Montserrat', sans-serif;
 }
 .info-delivery .info-text {
   margin-bottom: 16px;
@@ -179,6 +181,7 @@
   font-size: 16px;
   line-height: 130%;
   color: #000;
+  font-family: 'Montserrat', sans-serif;
 }
 .info-payment .info-text {
   margin-bottom: 10px;
@@ -224,6 +227,7 @@
   font-size: 16px;
   line-height: 130%;
   color: #202b21;
+  font-family: 'Montserrat', sans-serif;
 }
 .reviews-item-text {
   width: 336px;
@@ -232,6 +236,7 @@
   font-size: 16px;
   line-height: 140%;
   color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
 }
 .move-backwardRew {
   position: absolute;

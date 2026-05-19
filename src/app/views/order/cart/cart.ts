@@ -14,59 +14,53 @@ import { Router } from '@angular/router';
   styleUrl: './cart.css',
 })
 export class Cart implements OnInit {
-  private cartServices = inject(ServiceCart);
+  private cartService = inject(ServiceCart);
   private router = inject(Router);
   urlImg = Environments.urlImg;
 
-  productCart = this.cartServices.cartItems;
-  totalPrice = this.cartServices.cartTotal;
-  totalCount = this.cartServices.cartCount;
+  productCart = this.cartService.cartItems;
+  totalPrice = this.cartService.cartTotal;
+  totalCount = this.cartService.cartCount;
 
-  count: number = 0;
-  // productCarts = signal<TypeCart | null>(null);
-  constructor() {}
+  loading = signal<boolean>(true);
+  error = signal<string | null>(null);
 
   ngOnInit(): void {
-    // this.cartServices.getCart();
+    this.loadCart();
   }
 
-  // ✅ Увеличение количества
-  increaseQuantity(item: any): void {
-    this.cartServices.updateQuantity(item.product.id, item.quantity + 1).subscribe();
+  loadCart(): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    // ✅ Используем getCart() если нужен Observable, или просто loadCart()
+    this.cartService.getCart().subscribe({
+      next: () => {
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Ошибка загрузки:', err);
+        this.error.set('Не удалось загрузить корзину');
+        this.loading.set(false);
+      },
+    });
   }
 
-  // ✅ Уменьшение количества
-  decreaseQuantity(item: any): void {
-    if (item.quantity > 1) {
-      this.cartServices.updateQuantity(item.product.id, item.quantity - 1).subscribe();
-    }
-  }
+  // ✅ Обновление количества
+  updateQuantity(productId: string, newQuantity: number): void {
+    if (newQuantity < 1) return;
 
-  // ✅ Обработка ручного ввода
-  onQuantityInput(item: any, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    let value = parseInt(input.value, 10);
-
-    if (isNaN(value)) value = 1;
-    value = Math.max(1, Math.min(999, value));
-
-    this.cartServices.updateQuantity(item.product.id, value).subscribe();
+    this.cartService.updateQuantity(productId, newQuantity).subscribe({
+      error: (err) => console.error('Ошибка обновления:', err),
+    });
   }
 
   // ✅ Удаление товара
-  // removeItem(productId: string, quantity: number): void {
-  //   if (confirm('Удалить товар из корзины?')) {
-  //     const productIdNumber = Number(productId);
-  //     this.cartServices.removeFromCart(productIdNumber, quantity).subscribe();
-  //   }
-  // }
-
-  // ✅ Оформление заказа
-  checkout(): void {
-    if (this.productCart()?.length === 0) {
-      alert('Корзина пуста');
-      return;
+  removeItem(productId: string): void {
+    if (confirm('Удалить товар из корзины?')) {
+      this.cartService.removeFromCart(productId).subscribe({
+        error: (err) => console.error('Ошибка удаления:', err),
+      });
     }
-    this.router.navigate(['/checkout']);
   }
 }

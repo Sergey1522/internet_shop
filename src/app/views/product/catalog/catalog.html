@@ -63,12 +63,21 @@
             </svg>
           }
         </div>
-        <div class="catalog-sorting-body">
+
+        <div class="catalog-sorting-body" (click)="$event.stopPropagation()">
           <ul class="catalog-sorting-items">
-            <li class="catalog-sorting-item"><a href="">От А до Я</a></li>
-            <li class="catalog-sorting-item"><a href="">От Я до А</a></li>
-            <li class="catalog-sorting-item"><a href="">По возрастанию цены</a></li>
-            <li class="catalog-sorting-item"><a href="">По убыванию цены</a></li>
+            <li class="catalog-sorting-item" [class.active]="currentSort() === 'name-asc'">
+              <a (click)="setSort('name-asc')">От А до Я</a>
+            </li>
+            <li class="catalog-sorting-item" [class.active]="currentSort() === 'name-desc'">
+              <a (click)="setSort('name-desc')">От Я до А</a>
+            </li>
+            <li class="catalog-sorting-item" [class.active]="currentSort() === 'price-asc'">
+              <a (click)="setSort('price-asc')">По возрастанию цены</a>
+            </li>
+            <li class="catalog-sorting-item" [class.active]="currentSort() === 'price-desc'">
+              <a (click)="setSort('price-desc')">По убыванию цены</a>
+            </li>
           </ul>
         </div>
       </div>

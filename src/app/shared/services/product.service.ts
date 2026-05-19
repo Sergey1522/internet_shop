@@ -20,6 +20,10 @@ export class ProductService {
     let httpParams = new HttpParams();
 
     if (params) {
+      if (params.sort) {
+        httpParams = httpParams.set('sort', params.sort);
+        console.log('📊 Сортировка:', params.sort);
+      }
       if (params.page !== undefined && params.page !== null) {
         httpParams = httpParams.set('page', params.page);
       }

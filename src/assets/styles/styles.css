@@ -1,16 +1,30 @@
-@import url('_fonts.css');
-@import url('_global.css');
+@import url('./_fonts.css');
+@import url('./_global.css');
 
-app-layout {
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+app-root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-app-main {
+app-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+main {
   flex: 1 0 auto;
 }
 
 app-footer {
   flex-shrink: 0;
+  margin-top: auto;
 }

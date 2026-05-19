@@ -1,3 +1,5 @@
+import { SortType } from '../app/views/product/catalog/catalog';
+
 export type ProductType = {
   id: string;
   name: string;
@@ -8,6 +10,7 @@ export type ProductType = {
   temperature: string;
   height: number;
   diameter: number;
+  sort?: SortType;
   url: string;
   type: {
     id: string;
