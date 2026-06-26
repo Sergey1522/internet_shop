@@ -66,6 +66,18 @@
   cursor: pointer;
   color: #6cac72;
 }
+.button-in-cart span:first-child {
+  display: block;
+}
+.button-in-cart span:last-child {
+  display: none;
+}
+.product-card-action .button-transparent:hover.button-in-cart span:last-child {
+  display: block;
+}
+.product-card-action .button-transparent:hover.button-in-cart span:first-child {
+  display: none;
+}
 .product-card-extra {
   display: flex;
   justify-content: space-between;

@@ -1,4 +1,5 @@
-import { Component, computed, effect, OnInit, signal } from '@angular/core';
+import { map } from 'rxjs';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { ProductType } from '../../../../types/product.type';
 import { ProductService } from '../../../shared/services/product.service';
 import { ProductCard } from '../../../shared/conponents/product-card/product-card';
@@ -6,6 +7,11 @@ import { CategoryWithTypeType } from '../../../../types/category-with-type.type'
 import { ServiceCategory } from '../../../shared/services/service.category';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ServiceCart } from '../../../shared/services/service.cart';
+import { TypeCart } from '../../../../types/cart.type';
+import { FavoriteService } from '../../../shared/services/favorite.service';
+import { FavoriteType } from '../../../../types/favorite.type';
+import { DefaultResponseType } from '../../../../types/default.response.type';
 
 export type SortType = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 @Component({
@@ -16,11 +22,15 @@ export type SortType = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
   styleUrl: './catalog.css',
 })
 export class Catalog implements OnInit {
+  private favoriteService = inject(FavoriteService);
   openCategoryIndex = signal<number | null>(null);
   products = signal<ProductType[]>([]);
+  product = signal<ProductType | null>(null);
+  favorites = signal<FavoriteType[]>([]);
   categoryWithType = signal<CategoryWithTypeType[]>([]);
   open = false;
   pages: number[] = [];
+  cart = signal<TypeCart | null>(null);
 
   selectedTypeUrls = signal<Set<string>>(new Set());
   heightFrom = signal<number | null>(null);
@@ -34,10 +44,21 @@ export class Catalog implements OnInit {
 
   currentSort = signal<SortType>('name-asc');
   showSortMenu = signal<boolean>(false);
+  productsRaw = computed(() => {
+    const cartItems = this.cart()?.items || [];
+    const favoritesIds = new Set(this.favorites().map((f) => f.id));
+
+    return this.products().map((product) => ({
+      ...product,
+      countInCart: cartItems.find((item) => item.product.id === product.id)?.quantity ?? 0,
+      isInFavorite: favoritesIds.has(Number(product.id)),
+    }));
+  });
 
   constructor(
     private productService: ProductService,
     private serviceCategory: ServiceCategory,
+    private cartServices: ServiceCart,
     private router: Router,
     private route: ActivatedRoute,
   ) {
@@ -53,14 +74,38 @@ export class Catalog implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cartServices.getCart().subscribe((data: TypeCart) => {
+      this.cart.set(data);
+      console.log('Корзина загружена:', data);
+
+      this.loadCategoryWithTypes();
+    });
     this.route.queryParams.subscribe((params) => {
       this.applyFiltersFromUrl(params);
-       const categoryUrl = params['category'];
+      const categoryUrl = params['category'];
       if (categoryUrl) {
         this.applyCategoryFilter(categoryUrl);
       }
+      this.loadCategoryWithTypes();
     });
-    this.loadCategoryWithTypes();
+    // this.favoriteService.getFavorites().subscribe((data: FavoriteType[] | DefaultResponseType) => {
+    //   if ((data as DefaultResponseType).error !== undefined) {
+    //     const error = (data as DefaultResponseType).message;
+    //     throw new Error(error);
+    //   }
+    //   const products = this.products();
+    //   products.forEach((product) => {
+    //     const favoriteProducts = data as FavoriteType[];
+    //     const currentFavoriteProducts = favoriteProducts.find((item) => item.id === product.id);
+    //     console.log(currentFavoriteProducts);
+    //     if (currentFavoriteProducts) {
+    //       if (product) {
+    //         product.isInFavorite = true;
+    //         console.log(product);
+    //       }
+    //     }
+    //   });
+    // });
   }
   private updateActiveFilters(): void {
     const filters: { key: string; label: string; type: string; value?: any }[] = [];
@@ -80,13 +125,13 @@ export class Catalog implements OnInit {
     this.activeFilters.set(filters);
   }
 
-   private applyCategoryFilter(categoryUrl: string): void {
+  private applyCategoryFilter(categoryUrl: string): void {
     // Находим категорию и её типы
-    const category = this.categoryWithType().find(c => c.url === categoryUrl);
+    const category = this.categoryWithType().find((c) => c.url === categoryUrl);
 
     if (category && category.types && category.types.length > 0) {
       // Собираем все URL типов из выбранной категории
-      const typeUrls = category.types.map(type => type.url);
+      const typeUrls = category.types.map((type) => type.url);
       this.selectedTypeUrls.set(new Set(typeUrls));
       console.log(`✅ Применен фильтр по категории: ${category.name}, типы:`, typeUrls);
     } else {
@@ -96,7 +141,12 @@ export class Catalog implements OnInit {
 
   loadProducts(): void {
     const params = this.getApiParams();
-    params.page = this.currentPage(); // Добавляем параметр page
+    // params.page = this.currentPage();
+    const currentPage = this.currentPage();
+    if (currentPage > 1) {
+      params.page = currentPage;
+    }
+    // Добавляем параметр page
     params.limit = 12; // Количество товаров на странице
     this.productService.getProducts(params).subscribe({
       next: (response) => {
@@ -106,8 +156,18 @@ export class Catalog implements OnInit {
         for (let i = 1; i <= response.pages; i++) {
           this.pages.push(i);
         }
-        this.products.set(response.items || []);
-        console.log(response);
+        if (this.cart()) {
+          const cartItems = this.cart()?.items || [];
+          const updatedProducts = response.items.map((product) => ({
+            ...product,
+            countInCart: cartItems.find((item) => item.product.id === product.id)?.quantity ?? 0,
+          }));
+          this.products.set(updatedProducts);
+          console.log(updatedProducts);
+        } else {
+          this.products.set(response.items || []);
+          console.log(response);
+        }
       },
       error: (err) => {
         console.error('Ошибка загрузки продуктов:', err);
@@ -116,13 +176,14 @@ export class Catalog implements OnInit {
   }
   loadCategoryWithTypes(): void {
     this.serviceCategory.getCategoryWithTypes().subscribe((items) => {
-      console.log(items);
       this.categoryWithType.set(items);
     });
   }
   private getApiParams(): any {
     const params: any = {
       sort: this.currentSort(),
+      page: this.currentPage(),
+      limit: 12,
     };
 
     const types = Array.from(this.selectedTypeUrls());
@@ -159,7 +220,7 @@ export class Catalog implements OnInit {
     if (params['page']) {
       this.currentPage.set(Number(params['page']));
     } else {
-      this.currentPage.set(1);
+      // this.currentPage.set(1);
     }
   }
 
@@ -174,30 +235,30 @@ export class Catalog implements OnInit {
     }
 
     this.selectedTypeUrls.set(currentSet);
-    this.currentPage.set(1);
+    // this.currentPage.set(1);
   }
   onHeightFromChange(value: string): void {
     this.heightFrom.set(value ? Number(value) : null);
-    this.loadProducts();
-    this.currentPage.set(1);
+    // this.loadProducts();
+    // this.currentPage.set(1);
   }
 
   onHeightToChange(value: string): void {
     this.heightTo.set(value ? Number(value) : null);
-    this.loadProducts();
-    this.currentPage.set(1);
+    // this.loadProducts();
+    // this.currentPage.set(1);
   }
 
   onDiameterFromChange(value: string): void {
     this.diameterFrom.set(value ? Number(value) : null);
-    this.loadProducts();
-    this.currentPage.set(1);
+    // this.loadProducts();
+    // this.currentPage.set(1);
   }
 
   onDiameterToChange(value: string): void {
     this.diameterTo.set(value ? Number(value) : null);
-    this.loadProducts();
-    this.currentPage.set(1);
+    // this.loadProducts();
+    // this.currentPage.set(1);
   }
   private updateUrlParams(): void {
     const queryParams: any = {};
@@ -214,9 +275,7 @@ export class Catalog implements OnInit {
     if (this.currentSort() !== 'name-asc') {
       queryParams.sort = this.currentSort();
     }
-    if (this.currentPage() > 1) {
-      queryParams.page = this.currentPage();
-    }
+    queryParams.page = this.currentPage();
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -237,7 +296,7 @@ export class Catalog implements OnInit {
       this.diameterFrom.set(null);
       this.diameterTo.set(null);
     }
-    this.currentPage.set(1);
+    // this.currentPage.set(1);
   }
 
   toggleCategory(index: number): void {

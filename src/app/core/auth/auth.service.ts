@@ -40,6 +40,15 @@ export class AuthService {
     }
     throw throwError(() => 'Can not find token');
   }
+  refresh(): Observable<DefaultResponseType | LoginResponseType> {
+    const tokens = this.getTokens();
+    if (tokens && tokens.refreshToken) {
+      return this.http.post<DefaultResponseType>(Environments.api + 'refresh', {
+        refreshToken: tokens.refreshToken,
+      });
+    }
+    throw throwError(() => 'Can not use token');
+  }
 
   signup(
     email: string,

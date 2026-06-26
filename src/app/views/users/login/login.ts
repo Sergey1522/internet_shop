@@ -59,14 +59,18 @@ export class Login {
             this.authService.setTokens(loginResponse.accessToken, loginResponse.refreshToken);
             this.authService.userId = loginResponse.userId;
 
-            this._snackbar.open('Вы успешно авторизовались');
+            this._snackbar.open('Вы успешно авторизовались', '', {
+              duration: 3000,
+            });
             this.router.navigate(['/']);
           },
           error: (errorResponse: HttpErrorResponse) => {
             if (errorResponse.error && errorResponse.error.message) {
               this._snackbar.open(errorResponse.error.message);
             } else {
-              this._snackbar.open('Ошибка авторизации');
+              this._snackbar.open('Ошибка авторизации', '', {
+                duration: 3000,
+              });
             }
           },
         });

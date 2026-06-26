@@ -1,10 +1,10 @@
 <div class="ditail">
   <div class="container">
-    <div class="ditail-title">{{ product().name }}</div>
+    <div class="ditail-title">{{ product()?.name }}</div>
     <div class="ditail-content">
       <div
         class="ditail-img"
-        [ngStyle]="{ 'background-image': 'url(' + urlImg + product().image + ')' }"
+        [ngStyle]="{ 'background-image': 'url(' + urlImg + product()?.image + ')' }"
       ></div>
       <div class="ditail-info">
         <div class="ditail-info-item">
@@ -63,7 +63,7 @@
           <div class="ditail-info-desc">
             <div class="ditail-info-title">Освещение</div>
             <div class="ditail-info-text">
-              {{ product().lightning }}
+              {{ product()?.lightning }}
             </div>
           </div>
         </div>
@@ -105,7 +105,7 @@
           <div class="ditail-info-desc">
             <div class="ditail-info-title">Влажность</div>
             <div class="ditail-info-text">
-              {{ product().humidity }}
+              {{ product()?.humidity }}
             </div>
           </div>
         </div>
@@ -140,16 +140,16 @@
           <div class="ditail-info-desc">
             <div class="ditail-info-title">Температура</div>
             <div class="ditail-info-text">
-              {{ product().temperature }}
+              {{ product()?.temperature }}
             </div>
           </div>
         </div>
         <div class="ditail-sizes">
           <div class="size height">
-            Высота: <span> {{ product().height }} см</span>
+            Высота: <span> {{ product()?.height }} см</span>
           </div>
           <div class="size diameter">
-            Диаметр (горшка): <span>{{ product().diameter }} см</span>
+            Диаметр (горшка): <span>{{ product()?.diameter }} см</span>
           </div>
         </div>
         <div class="ditail-price-quantity">
@@ -157,6 +157,7 @@
             <span>Количество: </span>
             <div>
               <svg
+                (click)="decreaseQuantity()"
                 width="10"
                 height="3"
                 viewBox="0 0 10 3"
@@ -166,9 +167,10 @@
                 <path d="M9.14019 3V0H0V3H9.14019Z" fill="#9AA89B" />
               </svg>
             </div>
-            <input type="text" />
+            <input type="text" [value]="quantity" />
             <div>
               <svg
+                (click)="increaseQuantity()"
                 width="12"
                 height="12"
                 viewBox="0 0 12 12"
@@ -182,27 +184,56 @@
               </svg>
             </div>
           </div>
-          <div class="price">{{ product().price }} BYN</div>
+          <div class="price">{{ product()?.price }} BYN</div>
         </div>
         <div class="ditail-actions">
           <div class="btn">
-            <button class="button-transparent">
-              <svg
-                width="16"
-                height="15"
-                viewBox="0 0 16 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 14.3628C7.7693 14.3628 7.54605 14.333 7.36 14.266C4.51721 13.2912 0 9.8307 0 4.71814C0 2.11349 2.10605 0 4.69581 0C5.95349 0 7.1293 0.491163 8 1.3693C8.8707 0.491163 10.0465 0 11.3042 0C13.894 0 16 2.12093 16 4.71814C16 9.83814 11.4828 13.2912 8.64 14.266C8.45395 14.333 8.2307 14.3628 8 14.3628ZM4.69581 1.11628C2.72372 1.11628 1.11628 2.73116 1.11628 4.71814C1.11628 9.80093 6.00558 12.6288 7.72465 13.2167C7.8586 13.2614 8.14884 13.2614 8.28279 13.2167C9.99442 12.6288 14.8912 9.80837 14.8912 4.71814C14.8912 2.73116 13.2837 1.11628 11.3116 1.11628C10.1805 1.11628 9.13116 1.64465 8.45395 2.56C8.24558 2.84279 7.7693 2.84279 7.56093 2.56C6.86884 1.63721 5.82698 1.11628 4.69581 1.11628Z"
-                  fill="#6CAC72"
-                />
-              </svg>
-              В избранное
+            <button class="button-transparent" (click)="addFavorites()">
+              @if (product()?.isInFavorite) {
+                <svg
+                  width="20"
+                  height="18"
+                  viewBox="0 0 20 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9.85417 17.6917C9.57 17.6917 9.295 17.655 9.06583 17.5725C5.56417 16.3717 0 12.1092 0 5.81167C0 2.60333 2.59417 0 5.78417 0C7.33333 0 8.78167 0.605 9.85417 1.68667C10.9267 0.605 12.375 0 13.9242 0C17.1142 0 19.7083 2.6125 19.7083 5.81167C19.7083 12.1183 14.1442 16.3717 10.6425 17.5725C10.4133 17.655 10.1383 17.6917 9.85417 17.6917ZM5.78417 1.375C3.355 1.375 1.375 3.36417 1.375 5.81167C1.375 12.0725 7.3975 15.5558 9.515 16.28C9.68 16.335 10.0375 16.335 10.2025 16.28C12.3108 15.5558 18.3425 12.0817 18.3425 5.81167C18.3425 3.36417 16.3625 1.375 13.9333 1.375C12.54 1.375 11.2475 2.02583 10.4133 3.15333C10.1567 3.50167 9.57 3.50167 9.31333 3.15333C8.46083 2.01667 7.1775 1.375 5.78417 1.375Z"
+                    fill="#B6D5B9"
+                  />
+                  <path
+                    d="M5.78417 1.375C3.355 1.375 1.375 3.36417 1.375 5.81167C1.375 12.0725 7.3975 15.5558 9.515 16.28C9.68 16.335 10.0375 16.335 10.2025 16.28C12.3108 15.5558 18.3425 12.0817 18.3425 5.81167C18.3425 3.36417 16.3625 1.375 13.9333 1.375C12.54 1.375 11.2475 2.02583 10.4133 3.15333C10.1567 3.50167 9.57 3.50167 9.31333 3.15333C8.46083 2.01667 7.1775 1.375 5.78417 1.375Z"
+                    fill="#B6D5B9"
+                  />
+                </svg>
+                <span>В избранном</span>
+              } @else {
+                <svg
+                  width="16"
+                  height="15"
+                  viewBox="0 0 16 15"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8 14.3628C7.7693 14.3628 7.54605 14.333 7.36 14.266C4.51721 13.2912 0 9.8307 0 4.71814C0 2.11349 2.10605 0 4.69581 0C5.95349 0 7.1293 0.491163 8 1.3693C8.8707 0.491163 10.0465 0 11.3042 0C13.894 0 16 2.12093 16 4.71814C16 9.83814 11.4828 13.2912 8.64 14.266C8.45395 14.333 8.2307 14.3628 8 14.3628ZM4.69581 1.11628C2.72372 1.11628 1.11628 2.73116 1.11628 4.71814C1.11628 9.80093 6.00558 12.6288 7.72465 13.2167C7.8586 13.2614 8.14884 13.2614 8.28279 13.2167C9.99442 12.6288 14.8912 9.80837 14.8912 4.71814C14.8912 2.73116 13.2837 1.11628 11.3116 1.11628C10.1805 1.11628 9.13116 1.64465 8.45395 2.56C8.24558 2.84279 7.7693 2.84279 7.56093 2.56C6.86884 1.63721 5.82698 1.11628 4.69581 1.11628Z"
+                    fill="#6CAC72"
+                  />
+                </svg>
+                <span>В избранное</span>
+              }
             </button>
           </div>
-          <div class="btn"><button class="button">В корзину</button></div>
+          <div class="btnInCart">
+            @if (!isLoading()) {
+              <button class="button" (click)="addToCart()">В корзину</button>
+            } @else if (isLoading()) {
+              <button class="button-transparent button-in-cart">
+                <span>В корзинe</span>
+                <span (click)="removeFromCart()">Удалить</span>
+              </button>
+            }
+          </div>
         </div>
       </div>
     </div>

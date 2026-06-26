@@ -1,0 +1,46 @@
+<div class="favorite">
+  <div class="container">
+    <div class="favorite-title">Избранное</div>
+    <div class="favorite-products">
+      @for (item of favoriteProducts(); track $index) {
+        <div class="favorite-product">
+          <div
+            class="favorite-product-img"
+            [ngStyle]="{ 'background-image': 'url(' + urlImg + item.image + ')' }"
+          ></div>
+          <div class="favorite-product-name">{{ item.name }}</div>
+          <div class="favorite-product-price">{{ item.price }} BYN</div>
+          <div class="favorite-product-action">
+            <button class="button" [routerLink]="'/product/' + item.url">Открыть</button>
+          </div>
+          <div class="favorite-product-close" (click)="removeFavorite(item.id.toString())">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line
+                x1="1.93562"
+                y1="2.6499"
+                x2="13.9564"
+                y2="14.6707"
+                stroke="#A8ABA7"
+                stroke-linecap="round"
+              />
+              <line
+                x1="13.9238"
+                y1="2.62996"
+                x2="1.90301"
+                y2="14.6508"
+                stroke="#A8ABA7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

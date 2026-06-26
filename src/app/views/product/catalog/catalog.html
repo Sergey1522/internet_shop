@@ -199,7 +199,10 @@
 
       <div class="catalog-products">
         @for (product of products(); track product.id) {
-          <app-product-card [product]="product"></app-product-card>
+          <app-product-card
+            [countInCart]="product.countInCart ?? 0"
+            [product]="product"
+          ></app-product-card>
         }
       </div>
     </div>

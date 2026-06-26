@@ -1,5 +1,5 @@
 import { AuthService } from './../../../core/auth/auth.service';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { CategoryType } from '../../../../types/category.type';
 import { ServiceCategory } from '../../services/service.category';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { DefaultResponseType } from '../../../../types/default.response.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ServiceCart } from '../../services/service.cart';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -18,23 +20,58 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class Header implements OnInit {
   private _snackbar = inject(MatSnackBar);
-  isLogged: boolean = false;
+  isLogged = signal<boolean>(false);
   categories = signal<CategoryType[]>([]);
+  private cartService = inject(ServiceCart);
+  private destroy$ = new Subject<void>();
+  cartCount = signal<number>(0);
+  @Input() countInCart: number = 0;
   constructor(
     private categoryService: ServiceCategory,
     private authService: AuthService,
     private router: Router,
   ) {
-    this.isLogged = this.authService.getIsLoggedIn();
+    this.isLogged.set(this.authService.getIsLoggedIn());
   }
 
   ngOnInit(): void {
+    this.loadCartCount();
     this.categoryService.getCategory().subscribe((category: CategoryType[]) => {
       console.log(category);
       this.categories.set(category);
     });
     this.authService.isLogged$.subscribe((isLoggedIn: boolean) => {
-      this.isLogged = isLoggedIn;
+      this.isLogged.set(isLoggedIn);
+    });
+  }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadCartCount(): void {
+    this.cartService
+      .getCartCount()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.cartCount.set(data.count);
+          console.log('Cart count loaded:', data.count);
+        },
+        error: (err) => {
+          console.error('Ошибка загрузки количества:', err);
+          this.cartCount.set(0);
+        },
+      });
+    this.cartService.count$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (data) => {
+        this.cartCount.set(data);
+        console.log('Cart count loaded:', data);
+      },
+      error: (err) => {
+        console.error('Ошибка загрузки количества:', err);
+        this.cartCount.set(0);
+      },
     });
   }
 
@@ -42,18 +79,25 @@ export class Header implements OnInit {
     this.authService.logout().subscribe({
       next: (data: DefaultResponseType) => {
         if (data.error) {
-          this._snackbar.open('Ошибка выхода из системы');
+          this._snackbar.open('Ошибка выхода из системы', '', {
+            duration: 3000,
+          });
           throw new Error(data.message);
         }
         this.authService.removeTokens();
         this.authService.userId = null;
-        this._snackbar.open('Вы вышли из системы');
+        this._snackbar.open('Вы вышли из системы', '', {
+          duration: 3000,
+        });
+        this.router.navigate(['/']);
       },
       error: (error: HttpErrorResponse) => {
         if (error.error && error.error.message) {
           this._snackbar.open(error.error.message);
         } else {
-          this._snackbar.open('Ошибка выхода из системы');
+          this._snackbar.open('Ошибка выхода из системы', '', {
+            duration: 3000,
+          });
         }
       },
     });

@@ -12,6 +12,7 @@
 .cart-content {
   display: flex;
   align-items: baseline;
+  margin-bottom: 160px;
 }
 .cart-products.not {
   width: 678px;
@@ -168,4 +169,31 @@
   border-radius: 5px;
   padding: 15px 40px;
   width: 234px;
+}
+
+/* Carousel */
+.product-best {
+  padding: 120px 0 130px 0;
+}
+.carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.carousel-title {
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 130%;
+  color: #202b21;
+  margin-bottom: 50px;
+  font-family: 'Lora', sans-serif;
+}
+.carousel-arrows {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.carousel-arrows a svg {
+  cursor: pointer;
 }

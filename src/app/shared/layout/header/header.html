@@ -19,7 +19,7 @@
           <a href="#">+ 375 (29) 918-28-88</a>
         </div>
         <div class="social">
-          @if (!isLogged) {
+          @if (!isLogged()) {
             <a routerLink="/login">
               <svg
                 width="23"
@@ -52,7 +52,7 @@
               </svg>
             </a>
           }
-          @if (isLogged) {
+          @if (isLogged()) {
             <a [matMenuTriggerFor]="menu"
               ><svg
                 width="24"
@@ -90,7 +90,7 @@
             </mat-menu>
           }
 
-          <a href="#">
+          <a [routerLink]="'/favorite'">
             <svg
               width="22"
               height="22"
@@ -137,7 +137,7 @@
                 fill="#202B21"
               />
             </svg>
-            <span>4</span>
+            <span>{{ cartCount() }}</span>
           </a>
         </div>
       </div>

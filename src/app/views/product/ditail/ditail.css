@@ -176,3 +176,35 @@
 .carousel-arrows a svg {
   cursor: pointer;
 }
+
+.btnInCart .button-transparent {
+  background: #fff;
+  border: 1px solid #6cac72;
+  border-radius: 5px;
+  padding: 15px 96px;
+  width: 290px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Montserrat', sans-serif;
+}
+.btnInCart {
+  border-radius: 5px;
+  width: 290px;
+  height: 53px;
+}
+.button-in-cart span:first-child {
+  display: block;
+}
+.button-in-cart span:last-child {
+  display: none;
+}
+.btnInCart .button-transparent:hover.button-in-cart span:last-child {
+  display: block;
+}
+.btnInCart .button-transparent:hover.button-in-cart span:first-child {
+  display: none;
+}
