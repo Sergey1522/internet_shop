@@ -9,22 +9,34 @@ import { DefaultResponseType } from '../../../../types/default.response.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ServiceCart } from '../../services/service.cart';
-import { Subject, takeUntil } from 'rxjs';
+import { debounce, debounceTime, pipe, Subject, takeUntil } from 'rxjs';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ProductType } from '../../../../types/product.type';
+import { ProductService } from '../../services/product.service';
+import { Environments } from '../../../environments/environments';
+import { ScrollService } from '../../services/scroll-service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatMenuModule],
+  imports: [CommonModule, RouterLink, MatMenuModule, FormsModule, ReactiveFormsModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
 export class Header implements OnInit {
+  private productService = inject(ProductService);
+  private scrollService = inject(ScrollService);
   private _snackbar = inject(MatSnackBar);
+  showedSaerch = signal<boolean>(false);
   isLogged = signal<boolean>(false);
   categories = signal<CategoryType[]>([]);
+  products = signal<ProductType[]>([]);
   private cartService = inject(ServiceCart);
   private destroy$ = new Subject<void>();
   cartCount = signal<number>(0);
+  // searchValue = signal<string>('');
+  searchFiald = new FormControl();
+  urlImg = Environments.urlImg;
   @Input() countInCart: number = 0;
   constructor(
     private categoryService: ServiceCategory,
@@ -37,11 +49,19 @@ export class Header implements OnInit {
   ngOnInit(): void {
     this.loadCartCount();
     this.categoryService.getCategory().subscribe((category: CategoryType[]) => {
-      console.log(category);
       this.categories.set(category);
     });
     this.authService.isLogged$.subscribe((isLoggedIn: boolean) => {
       this.isLogged.set(isLoggedIn);
+    });
+    this.searchFiald.valueChanges.pipe(debounceTime(500)).subscribe((value) => {
+      if (value && value.length > 2) {
+        this.productService.getProductSearch(value).subscribe((data: ProductType[]) => {
+          this.products.set(data);
+        });
+      } else {
+        this.products.set([]);
+      }
     });
   }
   ngOnDestroy(): void {
@@ -103,10 +123,21 @@ export class Header implements OnInit {
     });
   }
   goToCategory(categoryUrl: string): void {
-    // Находим тип в категории
-    // Для простого перехода по категории используем URL категории
     this.router.navigate(['/catalog'], {
       queryParams: { category: categoryUrl },
     });
+  }
+  scrollToSection(sectionId: string): void {
+    this.scrollService.scrollToElement(sectionId);
+  }
+  selectProduct(url: string | undefined) {
+    this.router.navigate(['/product/' + url]);
+    this.searchFiald.setValue('');
+    this.products.set([]);
+  }
+  showedChangeSearch(value: boolean) {
+    setTimeout(() => {
+      this.showedSaerch.set(value);
+    }, 1000);
   }
 }

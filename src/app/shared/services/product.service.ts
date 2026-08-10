@@ -8,6 +8,9 @@ import { Environments } from '../../environments/environments';
   providedIn: 'root',
 })
 export class ProductService {
+  // scrollToElement(arg0: string) {
+  //   throw new Error('Method not implemented.');
+  // }
   private apiUrl = Environments.api + 'products';
   constructor(private http: HttpClient) {}
 
@@ -22,7 +25,6 @@ export class ProductService {
     if (params) {
       if (params.sort) {
         httpParams = httpParams.set('sort', params.sort);
-        console.log('📊 Сортировка:', params.sort);
       }
       if (params.page !== undefined && params.page !== null) {
         httpParams = httpParams.set('page', params.page);
@@ -33,7 +35,6 @@ export class ProductService {
       if (params.types && params.types.length) {
         params.types.forEach((type: string) => {
           httpParams = httpParams.append('types[]', type);
-          console.log(httpParams);
         });
       }
 
@@ -54,12 +55,14 @@ export class ProductService {
 
     // Формируем URL с параметрами
     const url = this.apiUrl + (httpParams.toString() ? `?${httpParams.toString()}` : '');
-    console.log('📡 Запрос URL:', url);
 
     return this.http.get<{ totalCount: number; pages: number; items: ProductType[] }>(url);
   }
 
   getProduct(url: string): Observable<ProductType> {
     return this.http.get<ProductType>(Environments.api + 'products/' + url);
+  }
+  getProductSearch(query: string): Observable<ProductType[]> {
+    return this.http.get<ProductType[]>(Environments.api + 'products/search?query=' + query);
   }
 }

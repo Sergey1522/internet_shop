@@ -1,18 +1,20 @@
 import { LoginResponseType } from './../../../types/login.response.type';
 import { inject, Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, finalize, Observable, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { DefaultResponseType } from '../../../types/default.response.type';
 import { Router } from '@angular/router';
+import { LoaderService } from '../../shared/services/loader';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  private loaderService = inject(LoaderService);
   authServices = inject(AuthService);
   router = inject(Router);
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    this.loaderService.show();
     const tokens = this.authServices.getTokens();
-    console.log(tokens);
     if (tokens && tokens.accessToken) {
       const authReq = req.clone({
         headers: req.headers.set('x-access-token', tokens.accessToken),
@@ -27,9 +29,16 @@ export class AuthInterceptor implements HttpInterceptor {
           }
           return throwError(() => error);
         }),
+        finalize(() => {
+          this.loaderService.hide();
+        }),
       );
     }
-    return next.handle(req);
+    return next.handle(req).pipe(
+      finalize(() => {
+        this.loaderService.hide();
+      }),
+    );
   }
   handle401Error(req: HttpRequest<any>, next: HttpHandler) {
     return this.authServices.refresh().pipe(

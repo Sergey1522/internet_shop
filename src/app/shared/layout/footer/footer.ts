@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CategoryType } from '../../../../types/category.type';
 import { ServiceCategory } from '../../services/service.category';
 
@@ -9,13 +9,11 @@ import { ServiceCategory } from '../../services/service.category';
   styleUrl: './footer.css',
 })
 export class Footer implements OnInit {
+  private readonly categoryService = inject(ServiceCategory);
   categories = signal<CategoryType[]>([]);
-
-  constructor(private categoryService: ServiceCategory) {}
 
   ngOnInit(): void {
     this.categoryService.getCategory().subscribe((category: CategoryType[]) => {
-      console.log(category);
       this.categories.set(category);
     });
   }

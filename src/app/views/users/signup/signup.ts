@@ -73,14 +73,14 @@ export class Signup {
             this.authService.setTokens(loginResponse.accessToken, loginResponse.refreshToken);
             this.authService.userId = loginResponse.userId;
 
-            this._snackbar.open('Вы успешно зарегистрировались');
+            this._snackbar.open('Вы успешно зарегистрировались', '', { duration: 3000 });
             this.router.navigate(['/']);
           },
           error: (errorResponse: HttpErrorResponse) => {
             if (errorResponse.error && errorResponse.error.message) {
               this._snackbar.open(errorResponse.error.message);
             } else {
-              this._snackbar.open('Ошибка регистрации');
+              this._snackbar.open('Ошибка регистрации', '', { duration: 3000 });
             }
           },
         });

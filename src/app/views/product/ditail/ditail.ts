@@ -1,5 +1,5 @@
 import { ServiceCart } from './../../../shared/services/service.cart';
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, inject, input, Input, OnInit, signal } from '@angular/core';
 import { ProductType } from '../../../../types/product.type';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
 import { ProductService } from '../../../shared/services/product.service';
@@ -11,6 +11,8 @@ import { TypeCart } from '../../../../types/cart.type';
 import { FavoriteType } from '../../../../types/favorite.type';
 import { DefaultResponseType } from '../../../../types/default.response.type';
 import { FavoriteService } from '../../../shared/services/favorite.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-ditail',
@@ -19,8 +21,11 @@ import { FavoriteService } from '../../../shared/services/favorite.service';
   styleUrl: './ditail.css',
 })
 export class Ditail implements OnInit {
+  private _snackbar = inject(MatSnackBar);
   private favoriteService = inject(FavoriteService);
+  private authServices = inject(AuthService);
   urlImg = Environments.urlImg;
+  protected readonly _isInFavorite = signal<boolean>(false);
   products = signal<ProductType[]>([]);
   quantity: number = 1;
   isLoading = signal(false);
@@ -99,25 +104,27 @@ export class Ditail implements OnInit {
 
           console.log('Товар с корзиной:', productWithCart);
         });
-        this.favoriteService
-          .getFavorites()
-          .subscribe((data: FavoriteType[] | DefaultResponseType) => {
-            if ((data as DefaultResponseType).error !== undefined) {
-              const error = (data as DefaultResponseType).message;
-              throw new Error(error);
-            }
-            const favoriteProducts = data as FavoriteType[];
-            const currentFavoriteProducts = favoriteProducts.find(
-              (item) => item.id === this.product()?.id,
-            );
-            console.log(currentFavoriteProducts);
-            if (currentFavoriteProducts) {
-              const product = this.product();
-              if (product) {
-                product.isInFavorite = true;
+        if (this.authServices.getIsLoggedIn()) {
+          this.favoriteService
+            .getFavorites()
+            .subscribe((data: FavoriteType[] | DefaultResponseType) => {
+              if ((data as DefaultResponseType).error !== undefined) {
+                const error = (data as DefaultResponseType).message;
+                throw new Error(error);
               }
-            }
-          });
+              const favoriteProducts = data as FavoriteType[];
+              const currentFavoriteProducts = favoriteProducts.find(
+                (item) => item.id === this.product()?.id,
+              );
+              console.log(currentFavoriteProducts);
+              if (currentFavoriteProducts) {
+                const product = this.product();
+                if (product) {
+                  this._isInFavorite.set(true);
+                }
+              }
+            });
+        }
       });
     });
 
@@ -126,60 +133,74 @@ export class Ditail implements OnInit {
     });
   }
   addToCart() {
+    const id = this.product()?.id;
+    if (id == null) {
+      return;
+    }
     if (this.product()?.id) {
-      this.cartService
-        .updateCart(this.product()?.id ?? 0, this.quantity)
-        .subscribe((data: TypeCart) => {
-          this.isLoading.set(true);
-          this.countInCart = this.quantity;
-
-          console.log(this.isLoading());
-          console.log(this.countInCart);
-        });
+      this.cartService.updateCart(id, this.quantity).subscribe((data: TypeCart) => {
+        this.isLoading.set(true);
+        this.countInCart = this.quantity;
+      });
     }
   }
   removeFromCart() {
-    this.cartService.updateCart(this.product()?.id ?? 0, 0).subscribe((data: TypeCart) => {
+    const id = this.product()?.id;
+    if (id == null) {
+      return;
+    }
+    this.cartService.updateCart(id, 0).subscribe((data: TypeCart) => {
       this.isLoading.set(false);
       this.quantity = 1;
-      // this.countInCart = 0;
-
-      console.log(data);
-      console.log(this.countInCart);
     });
   }
-  addFavorites() {
-    this.cartService
-      .addFavorites(this.product()?.id ?? 0)
-      .subscribe((data: FavoriteType | DefaultResponseType) => {
+  updateToFavorites() {
+    if (!this.authServices.getIsLoggedIn()) {
+      this._snackbar.open('Для добавление в избранное вам необходимо авторизоваться', '', {
+        duration: 3000,
+      });
+      return;
+    }
+    const id = this.product()?.id;
+    if (id == null) {
+      return;
+    }
+    if (this._isInFavorite()) {
+      this.favoriteService.removeFavorite(id).subscribe((data: DefaultResponseType) => {
+        if (data.error) {
+          //...
+
+          throw new Error(data.message);
+        }
+        this._isInFavorite.set(false);
+      });
+    } else {
+      this.cartService.addFavorites(id).subscribe((data: FavoriteType | DefaultResponseType) => {
         if ((data as DefaultResponseType).error !== undefined) {
           const error = (data as DefaultResponseType).message;
           throw new Error(error);
         }
 
-        const currentProduct = this.product();
-        if (currentProduct) {
-          this.product.set({
-            ...currentProduct,
-            isInFavorite: true,
-          });
-        }
-        console.log(data);
+        this._isInFavorite.set(true);
+        this.isLoading.set(false);
       });
+    }
   }
   // Увеличение количества
   increaseQuantity(): void {
     if (this.quantity < 999) {
       this.quantity++;
       if (this.isLoading()) {
-        this.cartService
-          .updateCart(this.product()?.id ?? 0, this.quantity)
-          .subscribe((data: TypeCart) => {
-            this.isLoading.set(true);
+        const id = this.product()?.id;
+        if (id == null) {
+          return;
+        }
+        this.cartService.updateCart(id, this.quantity).subscribe((data: TypeCart) => {
+          this.isLoading.set(true);
 
-            console.log(data);
-            console.log(this.countInCart);
-          });
+          console.log(data);
+          console.log(this.countInCart);
+        });
       }
     }
   }
@@ -189,25 +210,17 @@ export class Ditail implements OnInit {
     if (this.quantity > 1) {
       this.quantity--;
       if (this.isLoading()) {
-        this.cartService
-          .updateCart(this.product()?.id ?? 0, this.quantity)
-          .subscribe((data: TypeCart) => {
-            this.isLoading.set(true);
+        const id = this.product()?.id;
+        if (id == null) {
+          return;
+        }
+        this.cartService.updateCart(id, this.quantity).subscribe((data: TypeCart) => {
+          this.isLoading.set(true);
 
-            console.log(data);
-            console.log(this.countInCart);
-          });
+          console.log(data);
+          console.log(this.countInCart);
+        });
       }
     }
   }
-  // updateCart(value: number) {
-  //   this.quantity = value;
-  //   this.cartService.updateCart(this.product.id, this.quantity).subscribe((data: TypeCart) => {
-  //     this.isLoading.set(true);
-  //     this.countInCart = this.quantity;
-
-  //     console.log(data);
-  //     console.log(this.countInCart);
-  //   });
-  // }
 }

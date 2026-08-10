@@ -2,7 +2,7 @@
   <div class="container">
     <div class="favorite-title">Избранное</div>
     <div class="favorite-products">
-      @for (item of favoriteProducts(); track $index) {
+      @for (item of favoriteProducts(); track item.id) {
         <div class="favorite-product">
           <div
             class="favorite-product-img"
@@ -11,9 +11,17 @@
           <div class="favorite-product-name">{{ item.name }}</div>
           <div class="favorite-product-price">{{ item.price }} BYN</div>
           <div class="favorite-product-action">
-            <button class="button" [routerLink]="'/product/' + item.url">Открыть</button>
+            <!-- <button class="button" [routerLink]="'/product/' + item.url">Открыть</button> -->
+            @if (getQuantityInCart()) {
+              <button class="button" (click)="addToCart(item.id)">В корзину</button>
+            } @else if (getQuantityInCart()) {
+              <button class="button-transparent">
+                <span>В корзинe - {{ this.cartCount() }}шт.</span>
+                <!-- <span >Удалить</span> -->
+              </button>
+            }
           </div>
-          <div class="favorite-product-close" (click)="removeFavorite(item.id.toString())">
+          <div class="favorite-product-close" (click)="removeFavorite(item.id)">
             <svg
               width="16"
               height="16"

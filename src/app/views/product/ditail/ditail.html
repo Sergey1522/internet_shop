@@ -188,8 +188,8 @@
         </div>
         <div class="ditail-actions">
           <div class="btn">
-            <button class="button-transparent" (click)="addFavorites()">
-              @if (product()?.isInFavorite) {
+            <button class="button-transparent" (click)="updateToFavorites()">
+              @if (_isInFavorite()) {
                 <svg
                   width="20"
                   height="18"

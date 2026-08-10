@@ -51,7 +51,7 @@ export class Catalog implements OnInit {
     return this.products().map((product) => ({
       ...product,
       countInCart: cartItems.find((item) => item.product.id === product.id)?.quantity ?? 0,
-      isInFavorite: favoritesIds.has(Number(product.id)),
+      isInFavorite: favoritesIds.has(product.id),
     }));
   });
 
@@ -76,7 +76,6 @@ export class Catalog implements OnInit {
   ngOnInit(): void {
     this.cartServices.getCart().subscribe((data: TypeCart) => {
       this.cart.set(data);
-      console.log('Корзина загружена:', data);
 
       this.loadCategoryWithTypes();
     });
@@ -88,24 +87,6 @@ export class Catalog implements OnInit {
       }
       this.loadCategoryWithTypes();
     });
-    // this.favoriteService.getFavorites().subscribe((data: FavoriteType[] | DefaultResponseType) => {
-    //   if ((data as DefaultResponseType).error !== undefined) {
-    //     const error = (data as DefaultResponseType).message;
-    //     throw new Error(error);
-    //   }
-    //   const products = this.products();
-    //   products.forEach((product) => {
-    //     const favoriteProducts = data as FavoriteType[];
-    //     const currentFavoriteProducts = favoriteProducts.find((item) => item.id === product.id);
-    //     console.log(currentFavoriteProducts);
-    //     if (currentFavoriteProducts) {
-    //       if (product) {
-    //         product.isInFavorite = true;
-    //         console.log(product);
-    //       }
-    //     }
-    //   });
-    // });
   }
   private updateActiveFilters(): void {
     const filters: { key: string; label: string; type: string; value?: any }[] = [];
@@ -163,10 +144,8 @@ export class Catalog implements OnInit {
             countInCart: cartItems.find((item) => item.product.id === product.id)?.quantity ?? 0,
           }));
           this.products.set(updatedProducts);
-          console.log(updatedProducts);
         } else {
           this.products.set(response.items || []);
-          console.log(response);
         }
       },
       error: (err) => {
@@ -220,7 +199,6 @@ export class Catalog implements OnInit {
     if (params['page']) {
       this.currentPage.set(Number(params['page']));
     } else {
-      // this.currentPage.set(1);
     }
   }
 
@@ -235,30 +213,21 @@ export class Catalog implements OnInit {
     }
 
     this.selectedTypeUrls.set(currentSet);
-    // this.currentPage.set(1);
   }
   onHeightFromChange(value: string): void {
     this.heightFrom.set(value ? Number(value) : null);
-    // this.loadProducts();
-    // this.currentPage.set(1);
   }
 
   onHeightToChange(value: string): void {
     this.heightTo.set(value ? Number(value) : null);
-    // this.loadProducts();
-    // this.currentPage.set(1);
   }
 
   onDiameterFromChange(value: string): void {
     this.diameterFrom.set(value ? Number(value) : null);
-    // this.loadProducts();
-    // this.currentPage.set(1);
   }
 
   onDiameterToChange(value: string): void {
     this.diameterTo.set(value ? Number(value) : null);
-    // this.loadProducts();
-    // this.currentPage.set(1);
   }
   private updateUrlParams(): void {
     const queryParams: any = {};
@@ -296,7 +265,6 @@ export class Catalog implements OnInit {
       this.diameterFrom.set(null);
       this.diameterTo.set(null);
     }
-    // this.currentPage.set(1);
   }
 
   toggleCategory(index: number): void {
@@ -314,7 +282,7 @@ export class Catalog implements OnInit {
     }
 
     this.currentPage.set(page);
-    this.loadProducts(); // Перезагружаем товары
+    this.loadProducts();
   }
 
   nextPage(): void {
@@ -327,7 +295,6 @@ export class Catalog implements OnInit {
 
   //Sorting
 
-  // ✅ Текущая метка сортировки
   currentSortLabel = computed(() => {
     const labels: Record<SortType, string> = {
       'name-asc': 'От А до Я',
@@ -338,10 +305,9 @@ export class Catalog implements OnInit {
     return labels[this.currentSort()];
   });
 
-  // ✅ Методы сортировки
   setSort(sort: SortType): void {
     this.currentSort.set(sort);
-    this.currentPage.set(1); // Сбрасываем на первую страницу
+    this.currentPage.set(1);
     this.showSortMenu.set(false);
   }
 }

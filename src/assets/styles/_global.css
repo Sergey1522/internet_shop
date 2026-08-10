@@ -1,4 +1,6 @@
 @import url('./_fonts.css');
+/* @import url(./_data-form.css); */
+
 html,
 body {
   margin: 0;
@@ -118,4 +120,15 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+/* data-form */
+
+.button:disabled {
+  background-color: #e0e0e0;
+  color: #a0a0a0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.mat-mdc-progress-spinner circle {
+  stroke: #519057;
 }

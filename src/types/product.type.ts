@@ -1,7 +1,7 @@
 import { SortType } from '../app/views/product/catalog/catalog';
 
 export type ProductType = {
-  id?: number;
+  id?: string;
   name?: string;
   price?: number;
   image?: string;

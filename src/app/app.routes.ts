@@ -9,6 +9,9 @@ import { Cart } from './views/order/cart/cart';
 import { Favorite } from './views/personal/favorite/favorite';
 import { authForwardGuard } from './core/auth/auth-forward-guard';
 import { authGuard } from './core/auth/auth-guard';
+import { Order } from './views/order/order/order';
+import { Orders } from './views/personal/orders/orders';
+import { Info } from './views/personal/info/info';
 
 export const routes: Routes = [
   {
@@ -34,9 +37,21 @@ export const routes: Routes = [
         component: Cart,
       },
       {
+        path: 'order',
+        component: Order,
+      },
+      {
         path: 'favorite',
         component: Favorite,
         canActivate: [authGuard],
+      },
+      {
+        path: 'info',
+        component: Info,
+      },
+      {
+        path: 'orders',
+        component: Orders,
       },
 
       { path: 'signup', component: Signup, canActivate: [authForwardGuard] },

@@ -79,7 +79,7 @@ export class Cart implements OnInit {
     }
   }
   // Увеличение количества
-  increaseQuantity(count: number, id: number): void {
+  increaseQuantity(count: number, id: string): void {
     if (count < 999) {
       count++;
       this.cartService.updateCart(id, count).subscribe((data: TypeCart) => {
@@ -92,7 +92,7 @@ export class Cart implements OnInit {
   }
 
   // Уменьшение количества
-  decreaseQuantity(count: number, id: number): void {
+  decreaseQuantity(count: number, id: string): void {
     if (count > 1) {
       count--;
       this.cartService.updateCart(id, count).subscribe((data: TypeCart) => {
@@ -103,7 +103,7 @@ export class Cart implements OnInit {
       });
     }
   }
-  removeFromCart(id: number, count: number) {
+  removeFromCart(id: string, count: number) {
     this.cartService.updateCart(id ?? 0, (count = 0)).subscribe((data: TypeCart) => {
       console.log(data);
       // this.countInCart = count;
@@ -111,138 +111,4 @@ export class Cart implements OnInit {
       this.calculateTotal();
     });
   }
-  // ngOnDestroy(): void {
-  //   this.destroy$.next();
-  //   this.destroy$.complete();
-  // }
-
-  // // ✅ Загрузка корзины
-  // loadCart(): void {
-  //   this.loading.set(true);
-  //   this.error.set(null);
-
-  //   this.cartService
-  //     .getCart()
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe({
-  //       next: () => {
-  //         this.loading.set(false);
-  //       },
-  //       error: (err) => {
-  //         console.error('❌ Ошибка загрузки:', err);
-  //         this.error.set('Не удалось загрузить корзину');
-  //         this.loading.set(false);
-  //       },
-  //     });
-  // }
-
-  // // ✅ Универсальный метод обновления количества
-  // private updateQuantity(productId: string, quantity: number): void {
-  //   if (this.isLoading()) return;
-
-  //   this.isLoading.set(true);
-
-  //   this.cartService
-  //     .updateQuantity(productId, quantity)
-  //     .pipe(takeUntil(this.destroy$))
-  //     .subscribe({
-  //       next: () => {
-  //         console.log(`✅ Количество товара ${productId} обновлено до ${quantity}`);
-  //         this.isLoading.set(false);
-  //       },
-  //       error: (err) => {
-  //         console.error('❌ Ошибка обновления:', err);
-  //         this.error.set('Не удалось обновить количество');
-  //         this.isLoading.set(false);
-  //       },
-  //     });
-  // }
-
-  // // ✅ Увеличение количества
-  // increaseQuantity(item: any): void {
-  //   this.updateQuantity(item.product.id, item.quantity + 1);
-  // }
-
-  // // ✅ Уменьшение количества
-  // decreaseQuantity(item: any): void {
-  //   if (item.quantity > 1) {
-  //     this.updateQuantity(item.product.id, item.quantity - 1);
-  //   }
-  // }
-
-  // // ✅ Обработка ручного ввода количества
-  // onQuantityInput(item: any, event: Event): void {
-  //   const input = event.target as HTMLInputElement;
-  //   let value = parseInt(input.value, 10);
-
-  //   if (isNaN(value)) value = 1;
-  //   value = Math.max(1, Math.min(999, value));
-
-  //   if (value !== item.quantity) {
-  //     this.updateQuantity(item.product.id, value);
-  //   }
-  // }
-
-  // // ✅ Удаление товара из корзины
-  // removeItem(productId: string): void {
-  //   if (this.isLoading()) return;
-
-  //   if (confirm('Удалить товар из корзины?')) {
-  //     this.isLoading.set(true);
-
-  //     this.cartService
-  //       .removeFromCart(productId)
-  //       .pipe(takeUntil(this.destroy$))
-  //       .subscribe({
-  //         next: () => {
-  //           console.log(`✅ Товар ${productId} удален из корзины`);
-  //           this.isLoading.set(false);
-  //         },
-  //         error: (err) => {
-  //           console.error('❌ Ошибка удаления:', err);
-  //           this.error.set('Не удалось удалить товар');
-  //           this.isLoading.set(false);
-  //         },
-  //       });
-  //   }
-  // }
-
-  // // ✅ Очистка всей корзины
-  // clearCart(): void {
-  //   if (this.isLoading()) return;
-
-  //   if (confirm('Очистить всю корзину?')) {
-  //     this.isLoading.set(true);
-
-  //     this.cartService
-  //       .clearCart()
-  //       .pipe(takeUntil(this.destroy$))
-  //       .subscribe({
-  //         next: () => {
-  //           console.log('✅ Корзина очищена');
-  //           this.isLoading.set(false);
-  //         },
-  //         error: (err) => {
-  //           console.error('❌ Ошибка очистки:', err);
-  //           this.error.set('Не удалось очистить корзину');
-  //           this.isLoading.set(false);
-  //         },
-  //       });
-  //   }
-  // }
-
-  // // ✅ Переход к оформлению заказа
-  // checkout(): void {
-  //   if (this.productCart().length === 0) {
-  //     this.error.set('Корзина пуста');
-  //     setTimeout(() => this.error.set(null), 3000);
-  //     return;
-  //   }
-  //   this.router.navigate(['/checkout']);
-  // }
-
-  // // ✅ Переход в каталог
-  // goToCatalog(): void {
-  //   this.router.navigate(['/catalog']);
-  // }
 }

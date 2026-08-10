@@ -1,0 +1,49 @@
+@import url(./../../../../assets/styles/_data-form.css);
+
+.info {
+  padding: 50px 0 128px 0;
+  background-image: url(./../../../../assets/images/bg-info.png);
+  background-position: bottom right;
+  background-repeat: no-repeat;
+}
+.personal-title {
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Lora', sans-serif;
+  margin-bottom: 35px;
+}
+.personal-pages-selector {
+  margin-bottom: 50px;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 130%;
+  color: #202b21;
+  font-family: 'Lora', sans-serif;
+  display: flex;
+  align-items: center;
+
+  /* max-width: 417px; */
+}
+.personal-pege {
+  border-bottom: 2px solid #b6d5b9;
+  padding: 0 15px 12px;
+  cursor: pointer;
+}
+.personal-pege.active {
+  border-bottom: 3px solid #519057;
+}
+.data-form-label-rules {
+  font-weight: 400;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.button {
+  padding: 15px 40px;
+}

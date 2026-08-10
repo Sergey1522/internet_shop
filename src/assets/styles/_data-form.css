@@ -1,0 +1,175 @@
+.data-form-block {
+  margin-bottom: 30px;
+}
+.data-form-block:last-child {
+  margin-bottom: 0;
+}
+.data-form-label {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+}
+.data-form-types {
+  display: flex;
+  align-items: center;
+  border: 1px solid #519057;
+  border-radius: 3px;
+  width: 340px;
+  height: 49px;
+  margin-top: 20px;
+}
+.data-form-type-item.active {
+  background: #519057;
+  color: #fff;
+}
+.data-form-type-item {
+  background-color: transparent;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 130%;
+  color: #000;
+  border-radius: 3px 0 0 3px;
+  width: 164px;
+  text-align: center;
+  padding: 13px 35px;
+  cursor: pointer;
+}
+.data-form-inputs {
+  display: grid;
+  gap: 8px;
+}
+.show {
+  display: none;
+}
+.data-form-inputs.personai-data-inputs {
+  grid-template-columns: repeat(3, 210px);
+  margin-top: 20px;
+}
+.data-form-inputs.personai-data-inputs input {
+  border: 2px solid #2a592e;
+  border-radius: 3px;
+  padding: 18px 20px 18px 20px;
+  outline: none;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+}
+.data-form-inputs.personai-data-inputs input::placeholder {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  color: #a8aba7;
+  font-family: 'Montserrat', sans-serif;
+}
+.data-form-inputs.address-inputs {
+  grid-template-columns: repeat(2, 125px) 162px;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    'street street street'
+    'house entrance apartment';
+  margin-top: 20px;
+}
+.data-form-inputs.address-inputs .street {
+  grid-area: street;
+}
+.data-form-inputs.address-inputs .house {
+  grid-area: house;
+}
+.data-form-inputs.address-inputs .entrance {
+  grid-area: entrance;
+}
+.data-form-inputs.address-inputs .apartment {
+  grid-area: apartment;
+}
+.data-form-inputs.address-inputs input {
+  border: 2px solid #2a592e;
+  border-radius: 3px;
+  padding: 18px 20px 18px 20px;
+  outline: none;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+}
+.data-form-inputs.address-inputs input::placeholder {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  color: #a8aba7;
+  font-family: 'Montserrat', sans-serif;
+}
+.data-form-radio {
+  margin-top: 12px;
+}
+.data-form-radio-block {
+  margin-bottom: 12px;
+}
+.data-form-radio-block input[type='radio'] {
+  display: none;
+}
+.data-form-radio-block:last-child {
+  margin-bottom: 0;
+}
+.data-form-radio-block label {
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+  padding-left: 30px;
+  margin-right: 0;
+  line-height: 18px;
+  user-select: none;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+}
+.data-form-radio-block label::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  left: 0;
+  bottom: 1px;
+  background: url(./../images/ellipse\ 1.png) 0 0 no-repeat;
+}
+.data-form-radio-block input[type='radio']:checked + label:before {
+  background: url(./../images/radio-button.png) 0 0 no-repeat;
+}
+.data-form-radio-block label:hover:before {
+  filter: brightness(120%);
+}
+.data-form-radio-block input:checked + label {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+}
+.data-form-area {
+  margin-top: 23px;
+}
+.data-form-area textarea {
+  border: 2px solid #2a592e;
+  border-radius: 3px;
+  padding: 20px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #2c2c2c;
+  font-family: 'Montserrat', sans-serif;
+  outline: none;
+}
+.data-form-area textarea::placeholder {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  color: #a8aba7;
+}

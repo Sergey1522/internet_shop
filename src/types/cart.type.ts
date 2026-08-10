@@ -1,7 +1,7 @@
 export type TypeCart = {
   items: {
     product: {
-      id: number;
+      id: string;
       name: string;
       url: string;
       image: string;

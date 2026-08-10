@@ -11,8 +11,10 @@
           <ul class="menu">
             <li class="item"><a class="link" routerLink="/">Главная</a></li>
             <li class="item"><a class="link" routerLink="/catalog">Каталог</a></li>
-            <li class="item"><a class="link" href="#">Отзывы</a></li>
-            <li class="item"><a class="link" href="#">Доставка и оплата</a></li>
+            <li class="item"><a class="link" (click)="scrollToSection('reviews')">Отзывы</a></li>
+            <li class="item">
+              <a class="link" (click)="scrollToSection('info')">Доставка и оплата</a>
+            </li>
           </ul>
         </nav>
         <div class="phone">
@@ -85,7 +87,7 @@
               </svg>
             </a>
             <mat-menu #menu="matMenu">
-              <a routerLink="/profile" mat-menu-item>Профиль</a>
+              <a routerLink="/info" mat-menu-item>Профиль</a>
               <button (click)="logout()" mat-menu-item>Выйти</button>
             </mat-menu>
           }
@@ -155,7 +157,27 @@
         </div>
         <div class="search">
           <img src="assets/images/search-normal.png" alt="search" />
-          <input type="search" name="text" placeholder="Начните искать" />
+          <input
+            type="search"
+            name="text"
+            placeholder="Начните искать"
+            [formControl]="searchFiald"
+            (blur)="showedChangeSearch(false)"
+            (focus)="showedChangeSearch(true)"
+          />
+          <div class="search-products">
+            @if (showedSaerch() && products() && products().length > 0) {
+              @for (product of products(); track $index) {
+                <div class="search-product" (click)="selectProduct(product.url)">
+                  <div
+                    class="search-product-img"
+                    [ngStyle]="{ 'background-image': 'url(' + urlImg + product.image + ')' }"
+                  ></div>
+                  <div class="search-product-name">{{ product.name }}</div>
+                </div>
+              }
+            }
+          </div>
         </div>
       </div>
     </div>

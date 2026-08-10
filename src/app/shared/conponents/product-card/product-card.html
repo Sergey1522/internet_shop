@@ -1,7 +1,7 @@
-<div class="product-card" [routerLink]="isEasy ? ['/product/' + product.url] : []">
+<div class="product-card" [routerLink]="isEasy ? ['/product/' + product().url] : []">
   @if (!isEasy) {
-    <div class="product-card-favorite" (click)="addFavorites()">
-      @if (product.isInFavorite) {
+    <div class="product-card-favorite" (click)="updateToFavorites()">
+      @if (_isInFavorite()) {
         <svg
           width="20"
           height="18"
@@ -37,12 +37,12 @@
 
   <div
     class="product-card-img"
-    [ngStyle]="{ 'background-image': 'url(' + urlImg + product.image + ')' }"
+    [ngStyle]="{ 'background-image': 'url(' + urlImg + product().image + ')' }"
   ></div>
-  <div class="product-card-name">{{ product.name }}</div>
+  <div class="product-card-name">{{ product().name }}</div>
   @if (!isEasy) {
     <div class="product-card-info">
-      <div class="product-card-price">{{ product.price }} BYN</div>
+      <div class="product-card-price">{{ product().price }} BYN</div>
 
       <div class="product-card-action">
         @if (!isLoading()) {
@@ -93,7 +93,7 @@
           </svg>
         </div>
       </div>
-      <a [routerLink]="'/product/' + product.url" class="product-card-more">
+      <a [routerLink]="'/product/' + product().url" class="product-card-more">
         <svg
           width="18"
           height="4"
