@@ -1,5 +1,5 @@
 import { AuthService } from './../../../core/auth/auth.service';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { NgStyle } from '@angular/common';
@@ -7,6 +7,8 @@ import { DefaultResponseType } from '../../../../types/default.response.type';
 import { LoginResponseType } from '../../../../types/login.response.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Subject, takeUntil } from 'rxjs';
+import { ServiceCart } from '../../../shared/services/service.cart';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +16,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements OnInit {
   loginForm: FormGroup;
   private _snackbar = inject(MatSnackBar);
 
@@ -29,6 +31,7 @@ export class Login {
       rememberMe: [false],
     });
   }
+  ngOnInit(): void {}
 
   login(): void {
     if (this.loginForm.valid && this.loginForm.value.email && this.loginForm.value.password) {

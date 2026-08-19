@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
 import { ProductCard } from '../../shared/conponents/product-card/product-card';
@@ -6,6 +6,8 @@ import { ProductType } from '../../../types/product.type';
 import { Environments } from '../../environments/environments';
 import { ProductService } from '../../shared/services/product.service';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
+import { ServiceCart } from '../../shared/services/service.cart';
 
 @Component({
   selector: 'app-main',
@@ -16,6 +18,10 @@ import { CommonModule } from '@angular/common';
 })
 export class Main implements OnInit {
   products = signal<ProductType[]>([]);
+  private destro$ = new Subject<void>();
+  count$: Subject<number> = new Subject<number>();
+  cartService = inject(ServiceCart);
+  cartCount = signal<number>(0);
 
   customOptions: OwlOptions = {
     loop: true,
@@ -87,8 +93,39 @@ export class Main implements OnInit {
   ];
   constructor(private productService: ProductService) {}
   ngOnInit(): void {
+    this.loadCartCount();
     this.productService.getBestProduct().subscribe((product: ProductType[]) => {
       this.products.set(product);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destro$.next();
+    this.destro$.complete();
+  }
+  loadCartCount(): void {
+    this.cartService
+      .getCartCount()
+      .pipe(takeUntil(this.destro$))
+      .subscribe({
+        next: (data) => {
+          this.cartCount.set(data.count);
+          console.log('Cart count loaded:', data.count);
+        },
+        error: (err) => {
+          console.error('Ошибка загрузки количества:', err);
+          this.cartCount.set(0);
+        },
+      });
+    this.cartService.count$.pipe(takeUntil(this.destro$)).subscribe({
+      next: (data) => {
+        this.cartCount.set(data);
+        console.log('Cart count loaded:', data);
+      },
+      error: (err) => {
+        console.error('Ошибка загрузки количества:', err);
+        this.cartCount.set(0);
+      },
     });
   }
 }

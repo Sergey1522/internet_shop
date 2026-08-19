@@ -12,13 +12,13 @@
           <div class="favorite-product-price">{{ item.price }} BYN</div>
           <div class="favorite-product-action">
             <!-- <button class="button" [routerLink]="'/product/' + item.url">Открыть</button> -->
-            @if (getQuantityInCart()) {
-              <button class="button" (click)="addToCart(item.id)">В корзину</button>
-            } @else if (getQuantityInCart()) {
+            @if (this.isInCart()(item.id)) {
               <button class="button-transparent">
                 <span>В корзинe - {{ this.cartCount() }}шт.</span>
                 <!-- <span >Удалить</span> -->
               </button>
+            } @else {
+              <button class="button" (click)="addToCart(item.id)">В корзину</button>
             }
           </div>
           <div class="favorite-product-close" (click)="removeFavorite(item.id)">

@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
 import { ServiceCart } from '../../../shared/services/service.cart';
 import { TypeCart } from '../../../../types/cart.type';
 import { ProductType } from '../../../../types/product.type';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-favorite',
@@ -19,7 +20,7 @@ import { ProductType } from '../../../../types/product.type';
 export class Favorite implements OnInit {
   private cartService = inject(ServiceCart);
   private favoriteService = inject(FavoriteService);
-  // cartItems: any[] = [];
+  cartData = signal<TypeCart | null>(null);
   @Input() countInCart: number = 0;
   cartCount = signal<number>(0);
   favoriteProducts = signal<FavoriteType[]>([]);
@@ -27,34 +28,32 @@ export class Favorite implements OnInit {
   isLoading = signal(false);
   protected readonly inCart = signal<boolean>(false);
   urlImg = Environments.urlImg;
-  cartItems = this.cartService.cartItems;
+  private destro$ = new Subject<void>();
+  count$: Subject<number> = new Subject<number>();
+  // cartItems = this.cartService.cartItems();
 
-  // ✅ ДОБАВЛЕНО: Проверка, есть ли товар в корзине
   isInCart = computed(() => {
-    return (productId: string) => {
-      const items = this.cartItems();
-      if (!items) return false;
-      return items.some((item: any) => item.product?.id === productId);
-    };
-  });
-
-  // ✅ ДОБАВЛЕНО: Получение количества товара в корзине
-  getQuantityInCart = computed(() => {
+    const data = this.cartData();
     return (productId: string | undefined) => {
-      const items = this.cartItems();
-      if (!items) return 0;
-      const item = items.find((item: any) => item.product?.id === productId);
-      console.log(item);
-      return item || 0;
+      if (!data?.items || !productId) return false;
+      return data.items.some((item: any) => item.product?.id === productId);
     };
   });
-  constructor() {}
-  ngOnInit(): void {
-    if (this.countInCart > 0) {
-      this.isLoading.set(true);
-      this.quantity = this.countInCart;
-    }
 
+  getQuantityInCart = computed(() => {
+    const data = this.cartData();
+    return (productId: string | undefined) => {
+      if (!data?.items || !productId) return 0;
+      const item = data.items.find((item: any) => item.product?.id === productId);
+      return item?.quantity || 0;
+    };
+  });
+
+  constructor() {
+    console.log(this.count$);
+  }
+  ngOnInit(): void {
+    this.loadCartCount();
     this.favoriteService.getFavorites().subscribe((data: FavoriteType[] | DefaultResponseType) => {
       if ((data as DefaultResponseType).error !== undefined) {
         const error = (data as DefaultResponseType).message;
@@ -68,6 +67,44 @@ export class Favorite implements OnInit {
       }));
       console.log(favoritesWithCart);
       this.favoriteProducts.set(favoritesWithCart);
+      this.loadCartData();
+    });
+  }
+  loadCartCount(): void {
+    this.cartService
+      .getCartCount()
+      .pipe(takeUntil(this.destro$))
+      .subscribe({
+        next: (data) => {
+          this.cartCount.set(data.count);
+          console.log('Cart count loaded:', data.count);
+        },
+        error: (err) => {
+          console.error('Ошибка загрузки количества:', err);
+          this.cartCount.set(0);
+        },
+      });
+    this.cartService.count$.pipe(takeUntil(this.destro$)).subscribe({
+      next: (data) => {
+        this.cartCount.set(data);
+        console.log('Cart count loaded:', data);
+      },
+      error: (err) => {
+        console.error('Ошибка загрузки количества:', err);
+        this.cartCount.set(0);
+      },
+    });
+  }
+  loadCartData(): void {
+    this.cartService.getCart().subscribe({
+      next: (data: TypeCart) => {
+        this.cartData.set(data);
+        console.log('📦 Корзина загружена:', data);
+      },
+      error: (err) => {
+        console.error(err);
+        this.cartData.set(null);
+      },
     });
   }
   removeFavorite(id: string | undefined) {
@@ -83,6 +120,10 @@ export class Favorite implements OnInit {
       const favoriteProducts = this.favoriteProducts();
       this.favoriteProducts.set(favoriteProducts.filter((data) => data.id !== id));
     });
+  }
+  ngOnDestroy(): void {
+    this.destro$.next();
+    this.destro$.complete();
   }
   addToCart(id: string | undefined): void {
     if (!id) {
@@ -105,17 +146,22 @@ export class Favorite implements OnInit {
             item.id === id ? { ...item, quantityInCart: this.getQuantityInCart()(id) } : item,
           ),
         );
+
         // ✅ Обновляем счетчик корзины
-        this.cartService.getCartCount().subscribe({
-          next: (countData) => {
-            this.cartCount.set(countData.count);
-          },
-        });
+        // this.cartService.getCartCount().subscribe({
+        //   next: (countData) => {
+        //     this.cartCount.set(countData.count);
+        //   },
+        // });
+        this.loadCartData();
       },
       error: (err) => {
         console.error('❌ Ошибка добавления в корзину:', err);
         this.isLoading.set(false);
       },
     });
+  }
+  destroy$(destroy$: any): import('rxjs').OperatorFunction<number, number> {
+    throw new Error('Method not implemented.');
   }
 }

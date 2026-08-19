@@ -42,9 +42,12 @@ export class ProductCard implements OnInit {
   quantity: number = 1;
   isLoading = signal(false);
   isInCart = signal(false);
+  isLogged = signal<boolean>(false);
   protected readonly _isInFavorite = signal<boolean>(false);
 
-  constructor(private cartService: ServiceCart) {}
+  constructor(private cartService: ServiceCart) {
+    this.isLogged.set(this.authServices.getIsLoggedIn())
+  }
   ngOnInit(): void {
     if (this.countInCart > 0) {
       this.isLoading.set(true);

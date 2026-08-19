@@ -34,6 +34,7 @@ export class Header implements OnInit {
   private cartService = inject(ServiceCart);
   private destroy$ = new Subject<void>();
   cartCount = signal<number>(0);
+  isShowFavorite = signal<boolean>(false);
   // searchValue = signal<string>('');
   searchFiald = new FormControl();
   urlImg = Environments.urlImg;
@@ -110,6 +111,8 @@ export class Header implements OnInit {
           duration: 3000,
         });
         this.router.navigate(['/']);
+        this.loadCartCount();
+        
       },
       error: (error: HttpErrorResponse) => {
         if (error.error && error.error.message) {
