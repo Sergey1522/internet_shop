@@ -50,6 +50,25 @@
   margin-left: 8px;
   cursor: pointer;
 }
+.catalog-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: grey;
+  border-radius: 50px;
+  padding: 8px 14px;
+  cursor: pointer;
+  outline: none;
+  border: none;
+}
+.catalog-reset-btn span {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 130%;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+}
+
 .catalog-sorting {
   align-items: center;
   cursor: pointer;
@@ -63,12 +82,7 @@
   color: #2c2c2c;
   font-family: 'Montserrat', sans-serif;
 }
-/* .catalog-sorting span {
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 130%;
-  color: #2c2c2c;
-} */
+
 .catalog-sorting svg {
   margin-left: 8px;
 }

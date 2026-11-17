@@ -13,6 +13,7 @@ import { DefaultResponseType } from '../../../../types/default.response.type';
 import { FavoriteService } from '../../../shared/services/favorite.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-ditail',
@@ -66,71 +67,113 @@ export class Ditail implements OnInit {
     private activatedRoute: ActivatedRoute,
     private cartService: ServiceCart,
   ) {}
+  // ngOnInit(): void {
+  //   if (this.countInCart > 0) {
+  //     this.isLoading.set(true);
+  //     this.quantity = this.countInCart;
+  //   }
+  //   this.activatedRoute.params.subscribe((params) => {
+  //     this.productService.getProduct(params['url']).subscribe((data: ProductType) => {
+  //       this.cartService.getCart().subscribe((dataCart: TypeCart) => {
+  //         const cart = dataCart;
+
+  //         let countInCart = 0;
+
+  //         if (cart) {
+  //           const cartItems = cart.items || [];
+
+  //           const productInCart = cartItems.find((item) => item.product.id === data.id);
+  //           countInCart = productInCart?.quantity ?? 0;
+  //         }
+  //         const productWithCart = {
+  //           ...data,
+  //           countInCart: countInCart,
+  //         };
+  //         console.log(countInCart);
+  //         this.product.set(productWithCart);
+  //         if (countInCart > 0) {
+  //           this.isLoading.set(true);
+
+  //           this.quantity = countInCart;
+  //         }
+
+  //         console.log('Товар с корзиной:', productWithCart);
+  //       });
+  //       if (this.authServices.getIsLoggedIn()) {
+  //         this.favoriteService
+  //           .getFavorites()
+  //           .subscribe((data: FavoriteType[] | DefaultResponseType) => {
+  //             if ((data as DefaultResponseType).error !== undefined) {
+  //               const error = (data as DefaultResponseType).message;
+  //               throw new Error(error);
+  //             }
+  //             const favoriteProducts = data as FavoriteType[];
+  //             const currentFavoriteProducts = favoriteProducts.find(
+  //               (item) => item.id === this.product()?.id,
+  //             );
+  //             console.log(currentFavoriteProducts);
+  //             if (currentFavoriteProducts) {
+  //               const product = this.product();
+  //               if (product) {
+  //                 this._isInFavorite.set(true);
+  //               }
+  //             }
+  //           });
+  //       }
+  //     });
+  //   });
+
+  //   this.productService.getBestProduct().subscribe((product: ProductType[]) => {
+  //     this.products.set(product);
+  //   });
+  // }
   ngOnInit(): void {
-    if (this.countInCart > 0) {
-      this.isLoading.set(true);
-      this.quantity = this.countInCart;
-    }
-    this.activatedRoute.params.subscribe((params) => {
-      this.productService.getProduct(params['url']).subscribe((data: ProductType) => {
-        this.cartService.getCart().subscribe((dataCart: TypeCart) => {
-          const cart = dataCart;
-
-          let countInCart = 0;
-
-          if (cart) {
-            const cartItems = cart.items || [];
-
-            const productInCart = cartItems.find((item) => item.product.id === data.id);
-            countInCart = productInCart?.quantity ?? 0;
-          }
-
-          // ✅ Создаем товар с информацией о корзине
-          const productWithCart = {
-            ...data,
-            countInCart: countInCart,
-          };
-          console.log(countInCart);
-
-          // ✅ Только один set!
-          this.product.set(productWithCart);
-
-          // Если товар в корзине, устанавливаем флаг
-          if (countInCart > 0) {
-            this.isLoading.set(true);
-
-            this.quantity = countInCart;
-          }
-
-          console.log('Товар с корзиной:', productWithCart);
-        });
-        if (this.authServices.getIsLoggedIn()) {
-          this.favoriteService
-            .getFavorites()
-            .subscribe((data: FavoriteType[] | DefaultResponseType) => {
-              if ((data as DefaultResponseType).error !== undefined) {
-                const error = (data as DefaultResponseType).message;
-                throw new Error(error);
-              }
-              const favoriteProducts = data as FavoriteType[];
-              const currentFavoriteProducts = favoriteProducts.find(
-                (item) => item.id === this.product()?.id,
-              );
-              console.log(currentFavoriteProducts);
-              if (currentFavoriteProducts) {
-                const product = this.product();
-                if (product) {
-                  this._isInFavorite.set(true);
-                }
-              }
-            });
-        }
-      });
-    });
-
     this.productService.getBestProduct().subscribe((product: ProductType[]) => {
       this.products.set(product);
     });
+    this.activatedRoute.paramMap
+      .pipe(
+        switchMap((params) => {
+          const url = params.get('url');
+          this.quantity = 1;
+          this.isLoading.set(false);
+          this._isInFavorite.set(false);
+          this.product.set(null);
+
+          return this.productService.getProduct(url!);
+        }),
+      )
+      .subscribe((data: ProductType) => {
+        this.cartService.getCart().subscribe({
+          next: (dataCart: TypeCart) => {
+            let countInCart = 0;
+            if (dataCart && dataCart.items) {
+              const productInCart = dataCart.items.find((item) => item.product.id === data.id);
+              countInCart = productInCart?.quantity ?? 0;
+            }
+
+            this.product.set({ ...data, countInCart } as ProductType);
+
+            if (countInCart > 0) {
+              this.quantity = countInCart;
+              this.isLoading.set(true);
+            }
+          },
+          error: (err) => console.error('Ошибка загрузки корзины', err),
+        });
+        if (this.authServices.getIsLoggedIn()) {
+          this.favoriteService.getFavorites().subscribe({
+            next: (favData: FavoriteType[] | DefaultResponseType) => {
+              if ((favData as DefaultResponseType).error === undefined) {
+                const favoriteProducts = favData as FavoriteType[];
+                const isFav = favoriteProducts.some((item) => item.id === data.id);
+                this._isInFavorite.set(isFav);
+              }
+            },
+            error: (err) => console.error('Ошибка загрузки избранного', err),
+          });
+        }
+      });
   }
   addToCart() {
     const id = this.product()?.id;
@@ -186,41 +229,30 @@ export class Ditail implements OnInit {
       });
     }
   }
-  // Увеличение количества
   increaseQuantity(): void {
     if (this.quantity < 999) {
       this.quantity++;
       if (this.isLoading()) {
-        const id = this.product()?.id;
-        if (id == null) {
-          return;
-        }
-        this.cartService.updateCart(id, this.quantity).subscribe((data: TypeCart) => {
-          this.isLoading.set(true);
-
-          console.log(data);
-          console.log(this.countInCart);
-        });
+        this.syncCartWithServer();
       }
     }
   }
 
-  // Уменьшение количества
   decreaseQuantity(): void {
     if (this.quantity > 1) {
       this.quantity--;
       if (this.isLoading()) {
-        const id = this.product()?.id;
-        if (id == null) {
-          return;
-        }
-        this.cartService.updateCart(id, this.quantity).subscribe((data: TypeCart) => {
-          this.isLoading.set(true);
-
-          console.log(data);
-          console.log(this.countInCart);
-        });
+        this.syncCartWithServer();
       }
     }
+  }
+  private syncCartWithServer(): void {
+    const id = this.product()?.id;
+    if (!id) return;
+
+    this.cartService.updateCart(id, this.quantity).subscribe({
+      next: (data) => console.log('Количество обновлено', data),
+      error: (err) => console.error('Ошибка обновления количества', err),
+    });
   }
 }

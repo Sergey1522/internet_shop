@@ -26,6 +26,7 @@ export class AuthInterceptor implements HttpInterceptor {
             !authReq.url.includes('/login') &&
             !authReq.url.includes('/refresh')
           ) {
+            return this.handle401Error(authReq, next);
           }
           return throwError(() => error);
         }),
@@ -62,6 +63,7 @@ export class AuthInterceptor implements HttpInterceptor {
       }),
       catchError((error) => {
         this.authServices.removeTokens();
+        window.location.reload();
         this.router.navigate(['/']);
         return throwError(() => error);
       }),

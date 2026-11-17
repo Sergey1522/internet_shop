@@ -44,6 +44,12 @@ export class Catalog implements OnInit {
 
   currentSort = signal<SortType>('name-asc');
   showSortMenu = signal<boolean>(false);
+  readonly activeFiltersCount = computed(() => {
+    let count = this.selectedTypeUrls().size;
+    if (this.heightFrom() !== null || this.heightTo() !== null) count += 1;
+    if (this.diameterFrom() !== null || this.diameterTo() !== null) count += 1;
+    return count;
+  });
   productsRaw = computed(() => {
     const cartItems = this.cart()?.items || [];
     const favoritesIds = new Set(this.favorites().map((f) => f.id));
@@ -88,6 +94,15 @@ export class Catalog implements OnInit {
       this.loadCategoryWithTypes();
     });
   }
+  resetFilters(): void {
+    this.selectedTypeUrls.set(new Set());
+    this.heightFrom.set(null);
+    this.heightTo.set(null);
+    this.diameterFrom.set(null);
+    this.diameterTo.set(null);
+    this.currentPage.set(1);
+    this.loadProducts();
+  }
   private updateActiveFilters(): void {
     const filters: { key: string; label: string; type: string; value?: any }[] = [];
 
@@ -107,11 +122,9 @@ export class Catalog implements OnInit {
   }
 
   private applyCategoryFilter(categoryUrl: string): void {
-    // Находим категорию и её типы
     const category = this.categoryWithType().find((c) => c.url === categoryUrl);
 
     if (category && category.types && category.types.length > 0) {
-      // Собираем все URL типов из выбранной категории
       const typeUrls = category.types.map((type) => type.url);
       this.selectedTypeUrls.set(new Set(typeUrls));
       console.log(`✅ Применен фильтр по категории: ${category.name}, типы:`, typeUrls);
@@ -122,13 +135,11 @@ export class Catalog implements OnInit {
 
   loadProducts(): void {
     const params = this.getApiParams();
-    // params.page = this.currentPage();
     const currentPage = this.currentPage();
     if (currentPage > 1) {
       params.page = currentPage;
     }
-    // Добавляем параметр page
-    params.limit = 12; // Количество товаров на странице
+    params.limit = 12;
     this.productService.getProducts(params).subscribe({
       next: (response) => {
         this.pages = [];
@@ -292,8 +303,6 @@ export class Catalog implements OnInit {
   prevPage(): void {
     this.goToPage(this.currentPage() - 1);
   }
-
-  //Sorting
 
   currentSortLabel = computed(() => {
     const labels: Record<SortType, string> = {

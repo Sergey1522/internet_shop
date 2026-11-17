@@ -43,6 +43,46 @@
             </a>
           </div>
         }
+        @if (activeFiltersCount() >= 2) {
+          <div class="catalog-reset-btn">
+            <span>Сбросить фильтры</span>
+            <a
+              ><svg
+                (click)="resetFilters()"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="#fff"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g clip-path="url(#clip0_26505_960)">
+                  <line
+                    x1="1.93562"
+                    y1="2.6499"
+                    x2="13.9564"
+                    y2="14.6707"
+                    stroke="#A8ABA7"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="13.9238"
+                    y1="2.62996"
+                    x2="1.90301"
+                    y2="14.6508"
+                    stroke="#A8ABA7"
+                    stroke-linecap="round"
+                  />
+                </g>
+                <defs>
+                  <clipPath id="clip0_26505_960">
+                    <rect width="16" height="16" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+            </a>
+          </div>
+          <!-- <button class="catalog-reset-btn" (click)="resetFilters()">Сбросить фильтры</button> -->
+        }
       </div>
       <div class="catalog-sorting" [class.open]="openCategoryIndex() === -3">
         <div class="catalog-sorting-head" (click)="toggleCategory(-3)">
